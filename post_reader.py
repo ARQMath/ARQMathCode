@@ -5,7 +5,7 @@ from Entity_Parser.post_parser import PostParser
 from Entity_Parser.user_parser import UserParser
 from Entity_Parser.vote_parser import VoteParser
 from Visualization.generate_html_file import HtmlGenerator
-
+import argparse
 
 class DataReader:
     """
@@ -15,7 +15,7 @@ class DataReader:
         Also if the participant will to generate the html file for a given thread (question), they can use the
         get_html_pages where they specify list of questions id for which they want to get the html.
     """
-    def __init__(self, root_file_path):
+    def __init__(self, root_file_path, ignore_post_history=True):
         """
         This class read all the data file in MSE ARQMath Dataset. The root file of data is taken as the input
         and then each of the files are read and the related data are linked together.
@@ -31,8 +31,10 @@ class DataReader:
 
         print("reading users")
         self.user_parser = UserParser(users_file_path, badges_file_path)
-        print("reading edit histories")
-        self.post_history_parser = PostHistoryParser(post_history_file_path)
+        self.post_history_parser = None
+        if not ignore_post_history:
+            print("reading edit histories")
+            self.post_history_parser = PostHistoryParser(post_history_file_path)
         print("reading comments")
         self.comment_parser = CommentParser(comments_file_path)
         print("reading votes")
@@ -122,12 +124,16 @@ class DataReader:
 
 
 def main():
-    clef_home_directory_file_path = "/home/bm3302/Clef_ARQMath"
+    parser = argparse.ArgumentParser(description='By setting the file path for MSE ARQMath Dataset,'
+                                                 'One can iterate read the related data and go through questions')
+    parser.add_argument('-ds', type=str, help="File path for the MSE ARQMath Dataset.", required=True)
+    
+    args = vars(parser.parse_args())
+    clef_home_directory_file_path = (args['ds'])
     dr = DataReader(clef_home_directory_file_path)
-
     lst_questions = dr.get_question_of_tag("calculus")
     lst_answers = dr.get_answers_posted_by_user(132)
-    dr.get_html_pages([1, 5], "../")
+    dr.get_html_pages([1, 5], "../html_files")
 
 
 if __name__ == "__main__":
