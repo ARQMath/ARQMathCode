@@ -127,7 +127,7 @@ def main():
     parser = argparse.ArgumentParser(description='By setting the file path for MSE ARQMath Dataset,'
                                                  'One can iterate read the related data and go through questions')
     parser.add_argument('-ds', type=str, help="File path for the MSE ARQMath Dataset.", required=True)
-    
+
     args = vars(parser.parse_args())
     clef_home_directory_file_path = (args['ds'])
     dr = DataReader(clef_home_directory_file_path)

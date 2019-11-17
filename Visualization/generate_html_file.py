@@ -250,6 +250,6 @@ class HtmlGenerator:
                 html = HtmlGenerator.generate_post(html, title, post_id, post_score, post_body, post_answer_count,
                                                    tag_lst, rel_dic, user_html, comment_html, answer_html)
                 HtmlGenerator.save_html(html_directory+str(question_id)+".html", html)
-            except er:
+            except Exception as er:
                 print("issue generating html file for query:" + str(question_id))
-                print(er.message)
+                print(str(er))
