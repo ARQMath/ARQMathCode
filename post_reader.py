@@ -46,7 +46,7 @@ class DataReader:
                                        self.post_link_parser.map_related_posts,
                                        self.post_link_parser.map_duplicate_posts,
                                        self.vote_parser.map_of_votes, self.user_parser.map_of_user,
-                                       self.post_history_parser.map_of_edits)
+                                       self.post_history_parser)
 
     def get_list_of_questions_posted_in_a_year(self, year):
         """
