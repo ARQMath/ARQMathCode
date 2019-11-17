@@ -6,7 +6,7 @@ from Entities.Post import Answer, Question
 
 class PostParser:
     def __init__(self, xml_post_link_file_path, map_comments=None, map_related_post=None, map_duplicate_post=None,
-                 map_votes=None, map_users=None, map_edit=None):
+                 map_votes=None, map_users=None, post_history_parser=None):
         with codecs.open(xml_post_link_file_path, "r", "utf-8") as file:
             soup = BeautifulSoup(file, "html.parser")
         all_post = soup.find_all("row")
@@ -59,8 +59,8 @@ class PostParser:
                 comment_list = map_comments[post_id]
             if map_votes is not None and post_id in map_votes:
                 vote_list = map_votes[post_id]
-            if map_edit is not None and post_id in map_edit:
-                edit_list = map_edit[post_id]
+            if post_history_parser is not None and post_id in post_history_parser.map_of_edits:
+                edit_list = post_history_parser.map_of_edits[post_id]
 
             if post_type_id == 1:  # Question
                 title = (attr_dic["title"])
