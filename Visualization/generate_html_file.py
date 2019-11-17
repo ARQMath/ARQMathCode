@@ -1,7 +1,4 @@
-import os
-import webbrowser
-
-template_file = "../Visualization/template.html"
+template_file = "/Visualization/template.html"
 
 
 class HtmlGenerator:
