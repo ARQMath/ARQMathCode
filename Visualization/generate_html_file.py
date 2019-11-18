@@ -1,4 +1,4 @@
-template_file = "/Visualization/template.html"
+template_file = "Visualization/template.html"
 
 
 class HtmlGenerator:
