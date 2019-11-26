@@ -151,5 +151,5 @@ In this lab we will be using data from [Math Stack Exchange](https://math.stacke
 To facilate the data loading, the lab organizer provided a python code to read all the data and iterate over it. The code is available on [github](https://github.com/ARQMath/ARQMath). Also with this code, participants can view each thread (question along with answers and other related information) as html file.
 
 # Topics
-There are 3 sample topic (questions) provided for task 1. To extract the title of question, you can use "h1" tag. The post is located in "postcell" div
+There are 3 sample topics (questions) provided for task 1. To extract the title of question, you can use "h1" tag. The post is located in "postcell" div
 
