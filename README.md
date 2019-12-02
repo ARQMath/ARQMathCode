@@ -11,4 +11,4 @@ To begin the code, first download and locate the MSE ARQMath Dataset. Then you c
 
 ## Authors
 
-This code is provided by [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/) lab organizer. 
+This code is provided by [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/) lab organizers. 
