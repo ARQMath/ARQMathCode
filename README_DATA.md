@@ -1,3 +1,15 @@
+# Table of Contents  
+[ARQMath Clef 2020](#arqmath)  
+
+[Collection](#collection)
+
+[Available Tools](#tools)
+
+[Sample Topics](#topics)
+
+[Getting Started](#started)
+
+<a name="arqmath"></a>
 # ARQMath Clef 2020
 [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/) lab at [CLEF 2020](https://clef2020.clef-initiative.eu/).  focuses on mathematical information retrieval. There will be two tasks for this lab:
   ### Task 1 
@@ -7,8 +19,9 @@
   Given a formula as a query, participants should retrieve formulas related to the formula query.
   
  Futher information please check the ARQMath [webpage](https://www.cs.rit.edu/~dprl/ARQMath/). You may also consider joining the discussion forum [here](https://groups.google.com/forum/#!forum/arqmath-lab).
-
-# Dataset
+ 
+<a name="collection"></a>
+# Collection
 In this lab we will be using data from [Math Stack Exchange](https://math.stackexchange.com/) (MSE)The dateset for this lab is currently available on [Google Drive](https://drive.google.com/drive/folders/1ZPKIWDnhMGRaPNVLi1reQxZWTfH2R4u3?usp=sharing). This data was provided by [Archive](https://archive.org/) and several preprocessing have been done on the initial data. There are 7 files in this dataset:
   #### Users
   Users can post questions and answers and therefor each post is written by a user. Each users has a unique id along with other information such as display name, age, location, the date they created their profile and the reputations points earned based on their activities on MSE such as receiving an "up" vote on an answer given.
@@ -59,8 +72,8 @@ In this lab we will be using data from [Math Stack Exchange](https://math.stacke
        - LastActivityDate="2009-03-11T12:51:01.480"
        - CommunityOwnedDate="2009-03-11T12:51:01.480"
        - ClosedDate="2009-03-11T12:51:01.480"
-       - Title=
-       - Tags=
+       - Title
+       - Tags
        - AnswerCount
        - CommentCount
        - FavoriteCount
@@ -146,10 +159,30 @@ In this lab we will be using data from [Math Stack Exchange](https://math.stacke
      - CreationDate
      - UserId (only for VoteTypeId 5)
      - BountyAmount (only for VoteTypeId 9)
- 
+	
+<a name="tools"></a>
 # Available tools
-To facilate the data loading, the lab organizer provided a python code to read all the data and iterate over it. The code is available on [github](https://github.com/ARQMath/ARQMath). Also with this code, participants can view each thread (question along with answers and other related information) as html file.
+To facilitate the data loading, the lab organizer provided a python code to read all the data and iterate over it. The code is available on [github](https://github.com/ARQMath/ARQMath). Also with this code, participants can view each thread (question along with answers and other related information) as html file.
 
-# Topics
-There are 3 sample topics (questions) provided for task 1. To extract the title of question, you can use "h1" tag. The post is located in "postcell" div
+<a name="topics"></a>
+# Sample Topics
+There are 3 sample topics (questions) provided for task 1. To extract the title of question, you can use "h1" tag. The post is located in "postcell" div. The current qrel file is created just as an example. The criteria for selecting the candidate relevant documents for now is based on the duplicate and related post links that exists in the original math stack exchange dataset (from 2010 to 2019) and relevance is determined based on the community scores for each answer. There are 4 different relevance scores as follows:
 
+Relevance degree | Not relevant | Low | Medium | High
+--- | --- | --- | --- |--- |
+Score | 0 | 1 | 2 | 3
+
+
+<a name="started"></a>
+# Getting Started
+The ARQMath google drive, contains 4 directories. All the files have version and only the version that should be used for the task in kept in the directory and the older versions are kept in Old versions directory.
+
+The collection directory contains all the data files that will be used for both task one and two. Each of the two task, has their own directory. 
+
+For task one, there are three sample topic provided for now in Task1 directory. The sample qrel and query files are created for these three topics. Also a sample retrieval file is provided which is in standard trec format and evaluation can be done with trec eval tools.
+
+For task two, the data will be available soon.
+
+Finally formula directory, provides all the formulas in the collection in four different files, three of them showing  different representation of formulas, namely latex string, symbol layout tree and operator tree. (Only one is available for now.) There are 5 columns in these files showing formula id, post id, thread id, type of post they appeared in which can be question, answer, comment or title and finally formula itself which is represented accordingly. The fourth file will be combination of these three files.
+
+Check the [ARQMath forum](https://groups.google.com/forum/#!forum/arqmath-lab) for any further information
