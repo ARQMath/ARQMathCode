@@ -185,4 +185,4 @@ For task two, the data will be available soon.
 
 Finally formula directory, provides all the formulas in the collection in four different files, three of them showing  different representation of formulas, namely latex string, symbol layout tree and operator tree. (Only one is available for now.) There are 5 columns in these files showing formula id, post id, thread id, type of post they appeared in which can be question, answer, comment or title and finally formula itself which is represented accordingly. The fourth file will be combination of these three files.
 
-Check the [ARQMath forum](https://groups.google.com/forum/#!forum/arqmath-lab) for any further information
+Check the [ARQMath forum](https://groups.google.com/forum/#!forum/arqmath-lab) for any further information.
