@@ -1,14 +1,14 @@
-from Entity_Parser_All.comment_parser import CommentParser
-from Entity_Parser_All.post_history_parser import PostHistoryParser
-from Entity_Parser_All.post_link_parser import PostLinkParser
-from Entity_Parser_All.post_parser import PostParser
-from Entity_Parser_All.user_parser import UserParser
-from Entity_Parser_All.vote_parser import VoteParser
+from Entity_Parser_Record.comment_parser_record import CommentParserRecord
+from Entity_Parser_Record.post_history_parser_record import PostHistoryParserRecord
+from Entity_Parser_Record.post_link_parser_record import PostLinkParserRecord
+from Entity_Parser_Record.post_parser_record import PostParserRecord
+from Entity_Parser_Record.user_parser_record import UserParserRecord
+from Entity_Parser_Record.vote_parser_record import VoteParserRecord
 from Visualization.generate_html_file import HtmlGenerator
 import argparse
 
 
-class DataReader:
+class DataReaderRecord:
     """
         This is the data reader class for MSE ARQMath dataset.
         In the constructor, all the data is read and the related ones are linked together.
@@ -17,7 +17,7 @@ class DataReader:
         get_html_pages where they specify list of questions id for which they want to get the html.
 
 
-        The main difference with the other DataReader is that each file is read completely here.
+        The main difference with the other DataReader is that each file is read record by record here.
     """
 
     def __init__(self, root_file_path, ignore_post_history=True):
@@ -35,23 +35,23 @@ class DataReader:
         post_history_file_path = root_file_path + "/PostHistory.xml"
 
         print("reading users")
-        self.user_parser = UserParser(users_file_path, badges_file_path)
+        self.user_parser = UserParserRecord(users_file_path, badges_file_path)
         self.post_history_parser = None
         if not ignore_post_history:
             print("reading edit histories")
-            self.post_history_parser = PostHistoryParser(post_history_file_path)
+            self.post_history_parser = PostHistoryParserRecord(post_history_file_path)
         print("reading comments")
-        self.comment_parser = CommentParser(comments_file_path)
+        self.comment_parser = CommentParserRecord(comments_file_path)
         print("reading votes")
-        self.vote_parser = VoteParser(votes_file_path)
+        self.vote_parser = VoteParserRecord(votes_file_path)
         print("reading post links")
-        self.post_link_parser = PostLinkParser(post_links_file_path)
+        self.post_link_parser = PostLinkParserRecord(post_links_file_path)
         print("reading posts")
-        self.post_parser = PostParser(post_file_path, self.comment_parser.map_of_comments_for_post,
-                                      self.post_link_parser.map_related_posts,
-                                      self.post_link_parser.map_duplicate_posts,
-                                      self.vote_parser.map_of_votes, self.user_parser.map_of_user,
-                                      self.post_history_parser)
+        self.post_parser = PostParserRecord(post_file_path, self.comment_parser.map_of_comments_for_post,
+                                            self.post_link_parser.map_related_posts,
+                                            self.post_link_parser.map_duplicate_posts,
+                                            self.vote_parser.map_of_votes, self.user_parser.map_of_user,
+                                            self.post_history_parser)
 
     def get_list_of_questions_posted_in_a_year(self, year):
         """
@@ -135,7 +135,7 @@ def main():
 
     args = vars(parser.parse_args())
     clef_home_directory_file_path = (args['ds'])
-    dr = DataReader(clef_home_directory_file_path)
+    dr = DataReaderRecord(clef_home_directory_file_path)
     lst_questions = dr.get_question_of_tag("calculus")
     lst_answers = dr.get_answers_posted_by_user(132)
     dr.get_html_pages([1, 5], "../html_files")
