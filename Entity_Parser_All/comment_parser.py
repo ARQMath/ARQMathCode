@@ -6,7 +6,7 @@ from Entities.Comment import Comment
 
 class CommentParser:
     """
-    This calss is used for reading the comment file. It reads the whole file into the memory.
+    This class is used for reading the comment file. It reads the whole file into the memory.
     """
     def __init__(self, xml_comment_file_path):
         with codecs.open(xml_comment_file_path, "r", "utf-8") as file:
