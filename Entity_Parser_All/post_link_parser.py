@@ -3,6 +3,9 @@ from bs4 import BeautifulSoup
 
 
 class PostLinkParser:
+    """
+    This class reads the whole Post Link file.
+    """
     def __init__(self, xml_post_link_file_path):
         with codecs.open(xml_post_link_file_path, "r", "utf-8") as file:
             soup = BeautifulSoup(file, "html.parser")
