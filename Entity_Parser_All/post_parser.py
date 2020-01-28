@@ -5,6 +5,9 @@ from Entities.Post import Answer, Question
 
 
 class PostParser:
+    """
+        This class reads the post file. It reads the whole file into the memory.
+    """
     def __init__(self, xml_post_link_file_path, map_comments=None, map_related_post=None, map_duplicate_post=None,
                  map_votes=None, map_users=None, post_history_parser=None):
         with codecs.open(xml_post_link_file_path, "r", "utf-8") as file:
