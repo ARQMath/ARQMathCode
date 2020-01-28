@@ -5,6 +5,9 @@ from Entities.PostHistory import PostHistory
 
 
 class PostHistoryParser:
+    """
+    This class reads the post history file. It reads the whole file into the memory.
+    """
     def __init__(self, xml_post_history_file_path):
         with codecs.open(xml_post_history_file_path, "r", "utf-8") as file:
             soup = BeautifulSoup(file, "html.parser")
