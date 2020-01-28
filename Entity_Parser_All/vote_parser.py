@@ -5,6 +5,9 @@ from Entities.Vote import Vote
 
 
 class VoteParser:
+    """
+        This class reads the vote file. It reads the whole file into the memory.
+    """
     def __init__(self, xml_vote_file_path):
         with codecs.open(xml_vote_file_path, "r", "utf-8") as file:
             soup = BeautifulSoup(file, "html.parser")
