@@ -5,6 +5,9 @@ from Entities.User import User
 
 
 class UserParser:
+    """
+        This class reads the user file. It reads the whole file into the memory.
+    """
     def __init__(self, xml_user_file_path, xml_badges_file_path):
         with codecs.open(xml_user_file_path, "r", "utf-8") as file:
             soup = BeautifulSoup(file, "html.parser")
