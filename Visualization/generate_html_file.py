@@ -184,8 +184,9 @@ class HtmlGenerator:
             return HtmlGenerator.generate_user("user id: user", post_date.split("T")[0], 0,
                                                0, 0, 0)
         badges = [0, 0, 0]
-        for badge in user.lst_badges:
-            badges[badge[0] - 1] += 1
+        if user.lst_badges is not None:
+            for badge in user.lst_badges:
+                badges[badge[0] - 1] += 1
         return HtmlGenerator.generate_user("user id:" + str(user.id), post_date.split("T")[0], user.reputation,
                                            badges[0], badges[1],
                                            badges[2])
@@ -232,11 +233,11 @@ class HtmlGenerator:
                 post_answer_count = question.answer_count
                 tag_lst = question.tags
                 rel_dic = {}
-                for rel_id in question.related_post:
-                    if rel_id[0] not in data_reader.post_parser.map_questions:
-                        print(rel_id[0])
-                        continue
-                    rel_dic[rel_id[0]] = data_reader.post_parser.map_questions[rel_id[0]].title
+                if question.related_post is not None:
+                    for rel_id in question.related_post:
+                        if rel_id[0] not in data_reader.post_parser.map_questions:
+                            continue
+                        rel_dic[rel_id[0]] = data_reader.post_parser.map_questions[rel_id[0]].title
                 questioner = None
                 if question.owner_user_id in data_reader.user_parser.map_of_user:
                     questioner = data_reader.user_parser.map_of_user[question.owner_user_id]
