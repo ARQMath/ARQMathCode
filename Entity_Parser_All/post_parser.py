@@ -84,8 +84,8 @@ class PostParser:
                     comment_count = int(attr_dic["commentcount"])
                 if "answercount" in attr_dic:
                     answer_count = int(attr_dic["answercount"])
-                if "favouritecount" in attr_dic:
-                    favourite_count = int(attr_dic["favouritecount"])
+                if "favoritecount" in attr_dic:
+                    favourite_count = int(attr_dic["favoritecount"])
                 if "acceptedanswerid" in attr_dic:
                     accepted_answer_id = int(attr_dic["acceptedanswerid"])
                 if "closeddate" in attr_dic:
