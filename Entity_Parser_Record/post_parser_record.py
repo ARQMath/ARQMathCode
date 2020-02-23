@@ -77,8 +77,8 @@ class PostParserRecord:
                     comment_count = int(attr_dic["@CommentCount"])
                 if "@AnswerCount" in attr_dic:
                     answer_count = int(attr_dic["@AnswerCount"])
-                if "@FavouriteCount" in attr_dic:
-                    favourite_count = int(attr_dic["@FavouriteCount"])
+                if "@FavoriteCount" in attr_dic:
+                    favourite_count = int(attr_dic["@FavoriteCount"])
                 if "@AcceptedAnswerId" in attr_dic:
                     accepted_answer_id = int(attr_dic["@AcceptedAnswerId"])
                 if "@ClosedDate" in attr_dic:
