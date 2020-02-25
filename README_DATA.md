@@ -18,26 +18,27 @@
   ### Task 2
   Given a formula as a query, participants should retrieve formulas related to the formula query.
   
- Futher information please check the ARQMath [webpage](https://www.cs.rit.edu/~dprl/ARQMath/). You may also consider joining the discussion forum [here](https://groups.google.com/forum/#!forum/arqmath-lab).
+ 
+The data available for participants covers posts from the year 2010 to 2018. The topics for both tasks are selected from posts (questions) created in 2019, which is hidden from the participants. Providing an example, for task 1, the participant will be given a real-world math question (from 2019 questions) and they will set of relevant answers that were created for other questions in the years 2010 to 2018. Further information please check the ARQMath [webpage](https://www.cs.rit.edu/~dprl/ARQMath/). You may also consider joining the discussion forum [here](https://groups.google.com/forum/#!forum/arqmath-lab).
  
 <a name="collection"></a>
 # Collection
-In this lab we will be using data from [Math Stack Exchange](https://math.stackexchange.com/) (MSE)The dateset for this lab is currently available on [Google Drive](https://drive.google.com/drive/folders/1ZPKIWDnhMGRaPNVLi1reQxZWTfH2R4u3?usp=sharing). This data was provided by [Archive](https://archive.org/) and several preprocessing have been done on the initial data. There are 7 files in this dataset:
+In this lab, we will be using data from [Math Stack Exchange](https://math.stackexchange.com/) (MSE)The dateset for this lab is currently available on [Google Drive](https://drive.google.com/drive/folders/1ZPKIWDnhMGRaPNVLi1reQxZWTfH2R4u3?usp=sharing). This data was provided by [Archive](https://archive.org/) and several preprocessing have been done on the initial data. There are 7 files in this dataset:
   #### Users
-  Users can post questions and answers and therefor each post is written by a user. Each users has a unique id along with other information such as display name, age, location, the date they created their profile and the reputations points earned based on their activities on MSE such as receiving an "up" vote on an answer given.
+  Users can post questions and answers and therefore each post is written by a user. Each user has a unique id along with other information such as display name, age, location, the date they created their profile and the reputations points earned based on their activities on MSE such as receiving an "up" vote on an answer given.
   #### Badges
-  Besides reputation for each user, they can have a list of badges they received. There are three class of badges 3:bronze, 2:silver and 1:gold. Each badges is linked to a user by user id.
+  Besides the reputation for each user, they can have a list of badges they received. There are three classes of badges 3:bronze, 2:silver, and 1:gold. Each badge is linked to a user by user id.
   #### Votes
-  Members of MSE, can give different votes to questions and answers. In the vote file, for each vote there is a unique id, related post id, vote type [1 to 13], vote date and the user id of the voter.
+  Members of MSE, can give different votes to questions and answers. In the vote file, for each vote, there is a unique id, related post id, vote type [1 to 13], vote date and the user id of the voter.
   #### Tags  
-  Each question on the MSE, can have different tags that are determined by the user posting the question. In tag file, one can find list of all possible tags with their repetition count. However, in the post file, you can get the exact question tags.
+  Each question on the MSE, can have different tags that are determined by the user posting the question. In tag file, one can find a list of all possible tags with their repetition count. However, in the post file, you can get the exact question tags.
  #### Comments
- Users can comment on both questions and answers. In the comment file, each comment has its own unique id, along with the related post id, the id of user who written the comment, its creation date, its text and score.
+ Users can comment on both questions and answers. In the comment file, each comment has its own unique id, along with the related post id, the id of the user who wrote the comment, its creation date, its text, and score.
   #### PostLinks
   Each question on MSE can be associated with other questions; it can be related to another question or it can be its duplicate.
-  In the post links file, each link has a unique id, the post id of the question, the post id of related question (relatedpostid), the link type [1:related, 3:duplicate].
+  In the post links file, each link has a unique id, the post id of the question, the post id of the related question (relatedpostid), the link type [1:related, 3:duplicate].
 #### PostHistory
-  It is possible that several edits have been applied on a post. While in the post file, there is only the final version of the post, in this file, one can finds edits on a post. The data provided in this file, shows edit id, type of edit, post id, revision GUI id, creation date, user id and display name, comment, text and close reason id. 
+  It is possible that several edits have been applied to a post. While in the post file, there is only the final version of the post, in this file, one can finds edits on a post. The data provided in this file, shows edit id, type of edit, post id, revision GUI id, creation date, user id and display name, comment, text and close reason id. 
   #### Posts
   This is the main file for the task, where there are both questions and answers. Each post has a unique id, post type [1: question, 2:answer], the creation date, body, score and view count. For each answer, there is parent id which shows the question id for which the answer was provided. Each question has a title, set of tags and answer count.
   
@@ -162,11 +163,11 @@ In this lab we will be using data from [Math Stack Exchange](https://math.stacke
 	
 <a name="tools"></a>
 # Available tools
-To facilitate the data loading, the lab organizer provided a python code to read all the data and iterate over it. The code is available on [github](https://github.com/ARQMath/ARQMath). Also with this code, participants can view each thread (question along with answers and other related information) as html file.
+To facilitate the data loading, the lab organizer provided a python code to read all the data and iterate over it. The code is available on [github](https://github.com/ARQMath/ARQMath). Also with this code, participants can view each thread (question along with answers and other related information) as html file. The entities with their main attributes are shown in this ![Class Diagram](https://github.com/ARQMath/ARQMathDataset/blob/master/Clef_Class%20Diagram.jpg).
 
 <a name="topics"></a>
 # Sample Topics
-There are 3 sample topics (questions) provided for task 1. To extract the title of question, you can use "h1" tag. The post is located in "postcell" div. The current qrel file is created just as an example. The criteria for selecting the candidate relevant documents for now is based on the duplicate and related post links that exists in the original math stack exchange dataset (from 2010 to 2019) and relevance is determined based on the community scores for each answer. There are 4 different relevance scores as follows:
+There are 3 sample topics (questions) provided for task 1. To extract the title of the question, you can use "h1" tag. The post is located in "postcell" div. (You can also use our provided tools (read the related documentation.)) The current qrel file is created just as an example. The criteria for selecting the candidate relevant documents for now is based on the duplicate and related post links that exist in the original math stack exchange dataset (from 2010 to 2019) and relevance is determined based on the community scores for each answer. There are 4 different relevance scores as follows:
 
 Relevance degree | Not relevant | Low | Medium | High
 --- | --- | --- | --- |--- |
@@ -175,14 +176,16 @@ Score | 0 | 1 | 2 | 3
 
 <a name="started"></a>
 # Getting Started
-The ARQMath google drive, contains 4 directories. All the files have version and only the version that should be used for the task in kept in the directory and the older versions are kept in Old versions directory.
+The ARQMath google drive, contains 4 directories. All the files have version and only the version that should be used for the task is kept in the directory and the older versions are kept in Old versions directory.
 
-The collection directory contains all the data files that will be used for both task one and two. Each of the two task, has their own directory. 
+The collection directory contains all the data files (2010-2018) that will be used for both tasks one and two. Each of the two tasks has its own directory. Note that these directories will be used by participants to train their model, and also the retrieval results for both tasks are from these documents.
 
-For task one, there are three sample topic provided for now in Task1 directory. The sample qrel and query files are created for these three topics. Also a sample retrieval file is provided which is in standard trec format and evaluation can be done with trec eval tools.
+For task one, there are three sample topics provided for now in Task1 directory. The sample qrel and query files are created for these three topics. Also, a sample retrieval file is provided which is in standard trec format and evaluation can be done with trec eval tools.
 
 For task two, the data will be available soon.
 
-Finally formula directory, provides all the formulas in the collection in four different files, three of them showing  different representation of formulas, namely latex string, symbol layout tree and operator tree. (Only one is available for now.) There are 5 columns in these files showing formula id, post id, thread id, type of post they appeared in which can be question, answer, comment or title and finally formula itself which is represented accordingly. The fourth file will be combination of these three files.
+Finally, the formula directory provides all the formulas in the collection in 2 files. The formula_latex.tsv file is showing the Latex representation of formulas.  There are 5 columns in these files showing formula id, post id, thread id, type of post they appeared in which can be question, answer, comment or title and finally formula itself which is represented accordingly. The MathMl.zip file contains two tsv files in the same format of latex file which show opt(operator tree) and slt (symbol layout tree) representation of formulas.
+
+Note that all formulas have a unique id. In the collection, formulas are located in "math-container" tags. Using our provided tools, by defining the post id and formula id, participants are able to extract the formula, however, all the formulas are available in the tsv file. Also, it should be mention, our definition of formula is any string between two dollars ($) signs. Therefore, our dataset might contain noise (for instance, the cases that in the post, dollar sign is used as currency more than one time).
 
 Check the [ARQMath forum](https://groups.google.com/forum/#!forum/arqmath-lab) for any further information.
