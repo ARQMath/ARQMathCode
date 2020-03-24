@@ -20,7 +20,7 @@ class DataReaderRecord:
         The main difference with the other DataReader is that each file is read record by record here.
     """
 
-    def __init__(self, root_file_path, ignore_post_history=True):
+    def __init__(self, root_file_path):
         """
         This class read all the data file in MSE ARQMath Dataset. The root file of data is taken as the input
         and then each of the files are read and the related data are linked together.
@@ -32,14 +32,9 @@ class DataReaderRecord:
         votes_file_path = root_file_path + "/Votes.xml"
         users_file_path = root_file_path + "/Users.xml"
         post_links_file_path = root_file_path + "/PostLinks.xml"
-        post_history_file_path = root_file_path + "/PostHistory.xml"
 
         print("reading users")
         self.user_parser = UserParserRecord(users_file_path, badges_file_path)
-        self.post_history_parser = None
-        if not ignore_post_history:
-            print("reading edit histories")
-            self.post_history_parser = PostHistoryParserRecord(post_history_file_path)
         print("reading comments")
         self.comment_parser = CommentParserRecord(comments_file_path)
         print("reading votes")
@@ -50,8 +45,7 @@ class DataReaderRecord:
         self.post_parser = PostParserRecord(post_file_path, self.comment_parser.map_of_comments_for_post,
                                             self.post_link_parser.map_related_posts,
                                             self.post_link_parser.map_duplicate_posts,
-                                            self.vote_parser.map_of_votes, self.user_parser.map_of_user,
-                                            self.post_history_parser)
+                                            self.vote_parser.map_of_votes, self.user_parser.map_of_user)
 
     def get_list_of_questions_posted_in_a_year(self, year):
         """
