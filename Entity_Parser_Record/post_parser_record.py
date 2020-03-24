@@ -7,7 +7,7 @@ class PostParserRecord:
         This class is used for reading the post file. It reads it record by record.
     """
     def __init__(self, xml_post_link_file_path, map_comments=None, map_related_post=None, map_duplicate_post=None,
-                 map_votes=None, map_users=None, post_history_parser=None):
+                 map_votes=None, map_users=None):
         self.map_questions = {}
         self.map_answers = {}
         self.map_just_answers = {}
@@ -50,13 +50,10 @@ class PostParserRecord:
 
             comment_list = None
             vote_list = None
-            edit_list = None
             if map_comments is not None and post_id in map_comments:
                 comment_list = map_comments[post_id]
             if map_votes is not None and post_id in map_votes:
                 vote_list = map_votes[post_id]
-            if post_history_parser is not None and post_id in post_history_parser.map_of_edits:
-                edit_list = post_history_parser.map_of_edits[post_id]
 
             if post_type_id == 1:  # Question
                 title = (attr_dic["@Title"])
@@ -93,14 +90,14 @@ class PostParserRecord:
                                                        comment_count, last_edit_date, last_activity_date,
                                                        last_editor_user_id, community_owned_date,
                                                        last_editor_display_name, related_post, comment_list, vote_list,
-                                                       edit_list, user, title, lst_tags,
+                                                       user, title, lst_tags,
                                                        accepted_answer_id, answer_count, favourite_count, closed_date)
 
             elif post_type_id == 2:
                 parent_id = int(attr_dic["@ParentId"])
                 answer = Answer(post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
                                 last_edit_date, last_activity_date, last_editor_user_id, community_owned_date,
-                                last_editor_display_name, parent_id, comment_list, vote_list, edit_list, user)
+                                last_editor_display_name, parent_id, comment_list, vote_list, user)
 
                 if parent_id in self.map_answers:
                     self.map_answers[parent_id].append(answer)
