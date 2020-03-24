@@ -1,7 +1,7 @@
 class Post:
     def __init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
                  last_edit_date, last_activity_date, last_editor_user_id, community_owned_date, last_editor_display_name
-                 , comments, votes, revisions, user):
+                 , comments, votes, user):
         self.post_id = post_id
         self.post_type = 0
         self.creation_date = creation_date
@@ -18,7 +18,6 @@ class Post:
         self.last_editor_display_name = last_editor_display_name
         self.comments = comments
         self.votes = votes
-        self.revisions = revisions
         self.user = user
 
 
@@ -29,10 +28,10 @@ class Answer(Post):
     """
     def __init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count, last_edit_date,
                  last_activity_date, last_editor_user_id, community_owned_date, last_editor_display_name, parent_id,
-                 comments, votes, revisions, user):
+                 comments, votes, user):
         Post.__init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
                       last_edit_date, last_activity_date, last_editor_user_id, community_owned_date,
-                      last_editor_display_name, comments, votes, revisions, user)
+                      last_editor_display_name, comments, votes, user)
         self.post_type = 2
         self.parent_id = parent_id
 
@@ -44,11 +43,11 @@ class Question(Post):
     """
     def __init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
                  last_edit_date, last_activity_date, last_editor_user_id, community_owned_date,
-                 last_editor_display_name, related_post, comments, votes, revisions, user, title, tags,
+                 last_editor_display_name, related_post, comments, votes, user, title, tags,
                  accepted_answer_id, answer_count, favourite_count, closed_date):
         Post.__init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
                       last_edit_date, last_activity_date, last_editor_user_id, community_owned_date,
-                      last_editor_display_name, comments, votes, revisions, user)
+                      last_editor_display_name, comments, votes, user)
 
         self.related_post = related_post
         self.post_type = 1
