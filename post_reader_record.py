@@ -1,5 +1,4 @@
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
-from Entity_Parser_Record.post_history_parser_record import PostHistoryParserRecord
 from Entity_Parser_Record.post_link_parser_record import PostLinkParserRecord
 from Entity_Parser_Record.post_parser_record import PostParserRecord
 from Entity_Parser_Record.user_parser_record import UserParserRecord
