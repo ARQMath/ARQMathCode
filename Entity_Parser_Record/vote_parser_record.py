@@ -1,5 +1,5 @@
 from xmlr import xmliter
-from Entities.Vote import Vote
+from ..Entities.Vote import Vote
 
 
 class VoteParserRecord:

@@ -1,4 +1,4 @@
-from Entities.User import User
+from ..Entities.User import User
 from xmlr import xmliter
 
 
