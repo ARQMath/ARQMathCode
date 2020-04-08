@@ -25,12 +25,12 @@ class DataReaderRecord:
         and then each of the files are read and the related data are linked together.
         :param root_file_path: The root directory of MSE ARQMath Dataset.
         """
-        post_file_path = root_file_path + "/Posts.xml"
-        badges_file_path = root_file_path + "/Badges.xml"
-        comments_file_path = root_file_path + "/Comments.xml"
-        votes_file_path = root_file_path + "/Votes.xml"
-        users_file_path = root_file_path + "/Users.xml"
-        post_links_file_path = root_file_path + "/PostLinks.xml"
+        post_file_path = root_file_path + "/Posts_V1_0.xml"
+        badges_file_path = root_file_path + "/Badges.V1.0.xml"
+        comments_file_path = root_file_path + "/Comments.V1.0.xml"
+        votes_file_path = root_file_path + "/Votes.V1.0.xml"
+        users_file_path = root_file_path + "/Users.V1.0.xml"
+        post_links_file_path = root_file_path + "/PostLinks.V1.0.xml"
 
         print("reading users")
         self.user_parser = UserParserRecord(users_file_path, badges_file_path)

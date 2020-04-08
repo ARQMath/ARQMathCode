@@ -38,7 +38,7 @@ class Answer(Post):
 
 class Question(Post):
     """
-    Each question is a post, with list of posssible answers (if there are any). All the questions have post type of 1.
+    Each question is a post, with list of possible answers (if there are any). All the questions have post type of 1.
     There is a title for each question and set of tags. The other attributes can be None if they don't exist.
     """
     def __init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count,

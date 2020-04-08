@@ -45,7 +45,7 @@ class TopicReader:
 
 
 "In this example, the title and the question body of topic with id A.1 is printed."
-topic_file_path = "Topics_V1.2.xml"
+topic_file_path = "Topics_V2.0.xml"
 topic_reader = TopicReader(topic_file_path)
 topic_id = "A.1"
 print(topic_reader.get_topic(topic_id).title)
