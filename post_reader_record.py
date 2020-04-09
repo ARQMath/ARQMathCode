@@ -110,7 +110,7 @@ class DataReaderRecord:
             question = self.post_parser.map_questions[question_id]
             lst_tags = question.tags
             if tag in lst_tags:
-                lst_of_questions.append(tag)
+                lst_of_questions.append(question)
         return lst_of_questions
 
     def get_html_pages(self, lst_of_questions_id, result_directory):
