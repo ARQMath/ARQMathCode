@@ -1,3 +1,6 @@
+from trafilatura.core import extract
+
+
 class Post:
     def __init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
                  last_edit_date, last_activity_date, last_editor_user_id, community_owned_date, last_editor_display_name
@@ -26,6 +29,7 @@ class Answer(Post):
     Each answer is a post, with a parent id which shows the id of the question it belongs to.
     All the answers have the post_type of two.
     """
+
     def __init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count, last_edit_date,
                  last_activity_date, last_editor_user_id, community_owned_date, last_editor_display_name, parent_id,
                  comments, votes, user):
@@ -35,12 +39,16 @@ class Answer(Post):
         self.post_type = 2
         self.parent_id = parent_id
 
+    def to_str(self) -> str:
+        return extract(self.body)
+
 
 class Question(Post):
     """
     Each question is a post, with list of possible answers (if there are any). All the questions have post type of 1.
     There is a title for each question and set of tags. The other attributes can be None if they don't exist.
     """
+
     def __init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
                  last_edit_date, last_activity_date, last_editor_user_id, community_owned_date,
                  last_editor_display_name, related_post, comments, votes, user, title, tags,
@@ -65,3 +73,6 @@ class Question(Post):
             res = [i if self.accepted_answer_id == x.post_id else -1 for i, x in enumerate(answers)][0]
             answers.insert(0, answers.pop(res))
         self.answers = answers
+
+    def to_str(self) -> str:
+        return extract(self.title + '\n\n' + self.body)
