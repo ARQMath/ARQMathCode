@@ -1,9 +1,11 @@
+from .Entities.Post import Question, Answer
 from .Entity_Parser_Record.comment_parser_record import CommentParserRecord
 from .Entity_Parser_Record.post_link_parser_record import PostLinkParserRecord
 from .Entity_Parser_Record.post_parser_record import PostParserRecord
 from .Entity_Parser_Record.user_parser_record import UserParserRecord
 from .Entity_Parser_Record.vote_parser_record import VoteParserRecord
 from .Visualization.generate_html_file import HtmlGenerator
+from typing import List
 import argparse
 
 
@@ -62,14 +64,14 @@ class DataReaderRecord:
                 lst_of_question.append(question)
         return lst_of_question
 
-    def get_answers_for_question(self, question_id):
+    def get_answers_for_question(self, question_id) -> List[Answer]:
         """
 
         :param question_id:
         :return:
         """
         if question_id not in self.post_parser.map_questions:
-            return None
+            return []
         return self.post_parser.map_questions[question_id].answers
 
     def get_user(self, user_id):
@@ -82,7 +84,7 @@ class DataReaderRecord:
             return None
         return self.user_parser.map_of_user[user_id]
 
-    def get_answers_posted_by_user(self, user_id):
+    def get_answers_posted_by_user(self, user_id) -> List[Answer]:
         """
 
         :param user_id:
@@ -97,7 +99,7 @@ class DataReaderRecord:
                         lst_of_answers.append(answer)
         return lst_of_answers
 
-    def get_question_of_tag(self, tag):
+    def get_question_of_tag(self, tag) -> List[Question]:
         """
 
         :param tag:
