@@ -33,6 +33,12 @@ class DataReaderRecord:
         votes_file_path = root_file_path + "/Votes.V1.0.xml"
         users_file_path = root_file_path + "/Users.V1.0.xml"
         post_links_file_path = root_file_path + "/PostLinks.V1.0.xml"
+        # post_file_path = root_file_path + "/Posts.xml"
+        # badges_file_path = root_file_path + "/Badges.xml"
+        # comments_file_path = root_file_path + "/Comments.xml"
+        # votes_file_path = root_file_path + "/Votes.xml"
+        # users_file_path = root_file_path + "/Users.xml"
+        # post_links_file_path = root_file_path + "/PostLinks.xml"
 
         print("reading users")
         self.user_parser = UserParserRecord(users_file_path, badges_file_path)

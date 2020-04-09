@@ -1,6 +1,3 @@
-from trafilatura.core import extract
-
-
 class Post:
     def __init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
                  last_edit_date, last_activity_date, last_editor_user_id, community_owned_date, last_editor_display_name
@@ -39,9 +36,6 @@ class Answer(Post):
         self.post_type = 2
         self.parent_id = parent_id
 
-    def to_str(self) -> str:
-        return extract(self.body)
-
 
 class Question(Post):
     """
@@ -73,6 +67,3 @@ class Question(Post):
             res = [i if self.accepted_answer_id == x.post_id else -1 for i, x in enumerate(answers)][0]
             answers.insert(0, answers.pop(res))
         self.answers = answers
-
-    def to_str(self) -> str:
-        return extract(self.title + '\n\n' + self.body)
