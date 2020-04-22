@@ -15,11 +15,4 @@ This code is provided by [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/) lab or
 
 ## Lisence 
 On using this code please cite the following paper:
-@inproceedings{mansouri2020finding,
-  title={Finding Old Answers to New Math Questions: The ARQMath Lab at CLEF 2020},
-  author={Mansouri, Behrooz and Agarwal, Anurag and Oard, Douglas and Zanibbi, Richard},
-  booktitle={Advances in Information Retrieval: 42nd European Conference on IR Research, ECIR 2020, Lisbon, Portugal, April 14--17, 2020, Proceedings, Part II 42},
-  pages={564--571},
-  year={2020},
-  organization={Springer}
-}
+[Finding Old Answers to New Math Questions: The ARQMath Lab at CLEF 2020](https://link.springer.com/content/pdf/10.1007/978-3-030-45442-5_73.pdf)
