@@ -1,5 +1,5 @@
 from xmlr import xmliter
-from Entities.Post import Answer, Question
+from ..Entities.Post import Answer, Question
 
 
 class PostParserRecord:

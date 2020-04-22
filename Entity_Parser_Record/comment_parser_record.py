@@ -1,5 +1,5 @@
 from xmlr import xmliter
-from Entities.Comment import Comment
+from ..Entities.Comment import Comment
 
 
 class CommentParserRecord:

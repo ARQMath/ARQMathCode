@@ -1,9 +1,11 @@
-from Entity_Parser_Record.comment_parser_record import CommentParserRecord
-from Entity_Parser_Record.post_link_parser_record import PostLinkParserRecord
-from Entity_Parser_Record.post_parser_record import PostParserRecord
-from Entity_Parser_Record.user_parser_record import UserParserRecord
-from Entity_Parser_Record.vote_parser_record import VoteParserRecord
-from Visualization.generate_html_file import HtmlGenerator
+from .Entities.Post import Question, Answer
+from .Entity_Parser_Record.comment_parser_record import CommentParserRecord
+from .Entity_Parser_Record.post_link_parser_record import PostLinkParserRecord
+from .Entity_Parser_Record.post_parser_record import PostParserRecord
+from .Entity_Parser_Record.user_parser_record import UserParserRecord
+from .Entity_Parser_Record.vote_parser_record import VoteParserRecord
+from .Visualization.generate_html_file import HtmlGenerator
+from typing import List
 import argparse
 
 
@@ -31,6 +33,12 @@ class DataReaderRecord:
         votes_file_path = root_file_path + "/Votes.V1.0.xml"
         users_file_path = root_file_path + "/Users.V1.0.xml"
         post_links_file_path = root_file_path + "/PostLinks.V1.0.xml"
+        # post_file_path = root_file_path + "/Posts.xml"
+        # badges_file_path = root_file_path + "/Badges.xml"
+        # comments_file_path = root_file_path + "/Comments.xml"
+        # votes_file_path = root_file_path + "/Votes.xml"
+        # users_file_path = root_file_path + "/Users.xml"
+        # post_links_file_path = root_file_path + "/PostLinks.xml"
 
         print("reading users")
         self.user_parser = UserParserRecord(users_file_path, badges_file_path)
@@ -62,14 +70,14 @@ class DataReaderRecord:
                 lst_of_question.append(question)
         return lst_of_question
 
-    def get_answers_for_question(self, question_id):
+    def get_answers_for_question(self, question_id) -> List[Answer]:
         """
 
         :param question_id:
         :return:
         """
         if question_id not in self.post_parser.map_questions:
-            return None
+            return []
         return self.post_parser.map_questions[question_id].answers
 
     def get_user(self, user_id):
@@ -82,7 +90,7 @@ class DataReaderRecord:
             return None
         return self.user_parser.map_of_user[user_id]
 
-    def get_answers_posted_by_user(self, user_id):
+    def get_answers_posted_by_user(self, user_id) -> List[Answer]:
         """
 
         :param user_id:
@@ -97,7 +105,7 @@ class DataReaderRecord:
                         lst_of_answers.append(answer)
         return lst_of_answers
 
-    def get_question_of_tag(self, tag):
+    def get_question_of_tag(self, tag) -> List[Question]:
         """
 
         :param tag:
@@ -108,7 +116,7 @@ class DataReaderRecord:
             question = self.post_parser.map_questions[question_id]
             lst_tags = question.tags
             if tag in lst_tags:
-                lst_of_questions.append(tag)
+                lst_of_questions.append(question)
         return lst_of_questions
 
     def get_html_pages(self, lst_of_questions_id, result_directory):

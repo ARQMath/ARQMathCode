@@ -26,6 +26,7 @@ class Answer(Post):
     Each answer is a post, with a parent id which shows the id of the question it belongs to.
     All the answers have the post_type of two.
     """
+
     def __init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count, last_edit_date,
                  last_activity_date, last_editor_user_id, community_owned_date, last_editor_display_name, parent_id,
                  comments, votes, user):
@@ -41,6 +42,7 @@ class Question(Post):
     Each question is a post, with list of possible answers (if there are any). All the questions have post type of 1.
     There is a title for each question and set of tags. The other attributes can be None if they don't exist.
     """
+
     def __init__(self, post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
                  last_edit_date, last_activity_date, last_editor_user_id, community_owned_date,
                  last_editor_display_name, related_post, comments, votes, user, title, tags,
