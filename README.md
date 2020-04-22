@@ -12,3 +12,14 @@ Note that the DataReader is used for reading the data from 2010 to 2018. In orde
 ## Authors
 
 This code is provided by [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/) lab organizers. 
+
+## Lisence 
+On using this code please cite the following paper:
+@inproceedings{mansouri2020finding,
+  title={Finding Old Answers to New Math Questions: The ARQMath Lab at CLEF 2020},
+  author={Mansouri, Behrooz and Agarwal, Anurag and Oard, Douglas and Zanibbi, Richard},
+  booktitle={Advances in Information Retrieval: 42nd European Conference on IR Research, ECIR 2020, Lisbon, Portugal, April 14--17, 2020, Proceedings, Part II 42},
+  pages={564--571},
+  year={2020},
+  organization={Springer}
+}
