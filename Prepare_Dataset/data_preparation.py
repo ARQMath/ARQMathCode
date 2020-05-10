@@ -1,8 +1,11 @@
 import xml.etree.cElementTree as ET
-from xml.dom import minidom
-import codecs
-from bs4 import BeautifulSoup
 import csv
+import os
+import codecs
+
+from bs4 import BeautifulSoup
+from xml.dom import minidom
+
 
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
 
@@ -18,23 +21,24 @@ def read_formula_file(formula_file_path):
     """
     dic_res = {}
     dic_id_type = {}
-    with open(formula_file_path, mode='r', encoding="utf-8") as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter='\t')
-        first = False
-        for row in csv_reader:
-            if not first:
-                first = True
-                continue
-            formula_id = (row[0])
-            post_id = int(row[1])
-            doc_type = row[3]
-            formula = row[4]
-            if post_id in dic_res:
-                dic_res[post_id][formula_id] = formula
-            else:
-                temp = {formula_id: formula}
-                dic_res[post_id] = temp
-            dic_id_type[formula_id] = doc_type
+    for file in os.listdir(formula_file_path):
+        with open(formula_file_path+"/"+file, mode='r', encoding="utf-8") as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter='\t')
+            first = False
+            for row in csv_reader:
+                if not first:
+                    first = True
+                    continue
+                formula_id = (row[0])
+                post_id = int(row[1])
+                doc_type = row[3]
+                formula = row[4]
+                if post_id in dic_res:
+                    dic_res[post_id][formula_id] = formula
+                else:
+                    temp = {formula_id: formula}
+                    dic_res[post_id] = temp
+                dic_id_type[formula_id] = doc_type
     return dic_res, dic_id_type
 
 
@@ -93,8 +97,8 @@ def set_formulas(text, post_id, map_formulas, map_id_type, text_type):
         map_index[text4] = text.find(text4)
         text5 = "$" + formula + "$"
         map_index[text5] = text.find(text5)
-        text6 = formula
-        map_index[text6] = text.find(text6)
+        # text6 = formula
+        # map_index[text6] = text.find(text6)
         sorted_x = sorted(map_index.items(), key=lambda kv: kv[1])
         for item in sorted_x:
             if item[1] != -1:
@@ -107,14 +111,14 @@ def set_formulas(text, post_id, map_formulas, map_id_type, text_type):
     return result_text + text
 
 
-def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_index_file_path, new_xml_file_path):
+def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_latex_index_directory, new_xml_file_path):
     """First reads the formulas and save
     @param xml_post_link_file_path: Original post file from Archive
     @param formula_index_file_path: the formula index file (the tsv file containing the latex)
     @param new_xml_file_path: the result post file that will be used in ARQMath containing posts from 2010 to 2018 with
     annotated formulas.
     """
-    map_formulas, dic_id_type = read_formula_file(formula_index_file_path)
+    map_formulas, dic_id_type = read_formula_file(formula_latex_index_directory)
 
     "Creating the root for the new post file [the one for ARQMath]"
     root = ET.Element("posts")
@@ -209,7 +213,7 @@ def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_index_file_pa
         f.write(xml_str)
 
 
-def convert_mse_arqmath_comment_file(comments_file_path, formula_index_file_path, result_file_path):
+def convert_mse_arqmath_comment_file(comments_file_path, formula_latex_index_directory, result_file_path):
     """
     Takes in the Original comment file from MSE Archive, the extracted formula tsv file and the results file path
     for the new comment file and do the conversion.
@@ -217,13 +221,15 @@ def convert_mse_arqmath_comment_file(comments_file_path, formula_index_file_path
     @param formula_index_file_path: The extracted formulas tsv file
     @param result_file_path: The new xml comment file path.
     """
-    map_formulas, map_id_type = read_formula_file(formula_index_file_path)
+    map_formulas, map_id_type = read_formula_file(formula_latex_index_directory)
     comment_parser = CommentParserRecord(comments_file_path)
     root = ET.Element("comments")
     for post_id in comment_parser.map_of_comments_for_post:
         comment_lst = comment_parser.map_of_comments_for_post[post_id]
         for comment in comment_lst:
             creation_date = comment.creation_date
+            if creation_date is None:
+                continue
             if int(creation_date.split("T")[0].split("-")[0]) == 2019:
                 continue
             score = comment.score
@@ -249,9 +255,9 @@ def convert_mse_arqmath_comment_file(comments_file_path, formula_index_file_path
 
 def main():
     "Conversion of post file"
-    convert_mse_arqmath_post_file("Posts.xml", "Formula_topics_latex.tsv", "post_updated_V2.1.xml")
+    convert_mse_arqmath_post_file("Posts.xml", "/home/bm3302/latex_representation", "Posts.V1.1.xml")
     "Conversion of comment file"
-    convert_mse_arqmath_comment_file("/home/bm3302/Clef/Comments.xml", "Formula_topics_latex.tsv", "comment_correct.xml")
+    convert_mse_arqmath_comment_file("Comments.xml", "/home/bm3302/latex_representation", "Comments.V1.1.xml")
 
 if __name__ == '__main__':
     main()
