@@ -1,12 +1,13 @@
-from .Entities.Post import Question, Answer
-from .Entity_Parser_Record.comment_parser_record import CommentParserRecord
-from .Entity_Parser_Record.post_link_parser_record import PostLinkParserRecord
-from .Entity_Parser_Record.post_parser_record import PostParserRecord
-from .Entity_Parser_Record.user_parser_record import UserParserRecord
-from .Entity_Parser_Record.vote_parser_record import VoteParserRecord
-from .Visualization.generate_html_file import HtmlGenerator
-from typing import List
+import os
+from Entity_Parser_Record.comment_parser_record import CommentParserRecord
+from Entity_Parser_Record.post_link_parser_record import PostLinkParserRecord
+from Entity_Parser_Record.post_parser_record import PostParserRecord
+from Entity_Parser_Record.user_parser_record import UserParserRecord
+from Entity_Parser_Record.vote_parser_record import VoteParserRecord
+from Visualization.generate_html_file import HtmlGenerator
 import argparse
+from shutil import copyfile
+import csv
 
 
 class DataReaderRecord:
@@ -27,21 +28,17 @@ class DataReaderRecord:
         and then each of the files are read and the related data are linked together.
         :param root_file_path: The root directory of MSE ARQMath Dataset.
         """
-        post_file_path = root_file_path + "/Posts_V1_0.xml"
-        badges_file_path = root_file_path + "/Badges.V1.0.xml"
-        comments_file_path = root_file_path + "/Comments.V1.0.xml"
-        votes_file_path = root_file_path + "/Votes.V1.0.xml"
-        users_file_path = root_file_path + "/Users.V1.0.xml"
-        post_links_file_path = root_file_path + "/PostLinks.V1.0.xml"
-        # post_file_path = root_file_path + "/Posts.xml"
-        # badges_file_path = root_file_path + "/Badges.xml"
-        # comments_file_path = root_file_path + "/Comments.xml"
-        # votes_file_path = root_file_path + "/Votes.xml"
-        # users_file_path = root_file_path + "/Users.xml"
-        # post_links_file_path = root_file_path + "/PostLinks.xml"
+        post_file_path = root_file_path + "/Posts.xml"
+        badges_file_path = root_file_path + "/Badges.xml"
+        comments_file_path = root_file_path + "/Comments.xml"
+        votes_file_path = root_file_path + "/Votes.xml"
+        users_file_path = root_file_path + "/Users.xml"
+        post_links_file_path = root_file_path + "/PostLinks.xml"
+        post_history_file_path = root_file_path + "/PostHistory.xml"
 
         print("reading users")
         self.user_parser = UserParserRecord(users_file_path, badges_file_path)
+        self.post_history_parser = None  # post_history_file_path
         print("reading comments")
         self.comment_parser = CommentParserRecord(comments_file_path)
         print("reading votes")
@@ -52,13 +49,13 @@ class DataReaderRecord:
         self.post_parser = PostParserRecord(post_file_path, self.comment_parser.map_of_comments_for_post,
                                             self.post_link_parser.map_related_posts,
                                             self.post_link_parser.map_duplicate_posts,
-                                            self.vote_parser.map_of_votes, self.user_parser.map_of_user)
+                                            self.vote_parser.map_of_votes, self.user_parser.map_of_user,
+                                            self.post_history_parser)
 
     def get_list_of_questions_posted_in_a_year(self, year):
         """
-
-        :param year:
-        :return:
+        :param year: the year for which we look for its questions
+        :return: return all the questions posted in input year
         """
         lst_of_question = []
         for question_id in self.post_parser.map_questions:
@@ -70,31 +67,28 @@ class DataReaderRecord:
                 lst_of_question.append(question)
         return lst_of_question
 
-    def get_answers_for_question(self, question_id) -> List[Answer]:
+    def get_answers_for_question(self, question_id):
         """
-
-        :param question_id:
-        :return:
+        :param question_id: the question id for which we want the list of answers given to it
+        :return: the list of answers given to question with specific id
         """
         if question_id not in self.post_parser.map_questions:
-            return []
+            return None
         return self.post_parser.map_questions[question_id].answers
 
     def get_user(self, user_id):
         """
-
-        :param user_id:
-        :return:
+        :param user_id: the id of user that we want its profile
+        :return: return user profile of user with specif id
         """
         if user_id not in self.user_parser.map_of_user:
             return None
         return self.user_parser.map_of_user[user_id]
 
-    def get_answers_posted_by_user(self, user_id) -> List[Answer]:
+    def get_answers_posted_by_user(self, user_id):
         """
-
-        :param user_id:
-        :return:
+        :param user_id: user id for which we want the list of answers given by that user
+        :return: a list of answers given by user with input id
         """
         lst_of_answers = []
         for parent_id in self.post_parser.map_answers:
@@ -105,26 +99,24 @@ class DataReaderRecord:
                         lst_of_answers.append(answer)
         return lst_of_answers
 
-    def get_question_of_tag(self, tag) -> List[Question]:
+    def get_question_of_tag(self, tag):
         """
-
-        :param tag:
-        :return:
+        Return a list of questions with a specific tag
+        :param tag: tag to find questions having it
+        :return: list of questions with the input tag
         """
         lst_of_questions = []
         for question_id in self.post_parser.map_questions:
             question = self.post_parser.map_questions[question_id]
             lst_tags = question.tags
             if tag in lst_tags:
-                lst_of_questions.append(question)
+                lst_of_questions.append(tag)
         return lst_of_questions
 
     def get_html_pages(self, lst_of_questions_id, result_directory):
         """
-
-        :param lst_of_questions_id:
-        :param result_directory:
-        :return:
+        :param lst_of_questions_id: list of question to create their html views
+        :param result_directory: directory to save html files
         """
         HtmlGenerator.questions_to_html(lst_of_questions_id, self, result_directory)
 
@@ -133,7 +125,6 @@ def main():
     parser = argparse.ArgumentParser(description='By setting the file path for MSE ARQMath Dataset,'
                                                  'One can iterate read the related data and go through questions')
     parser.add_argument('-ds', type=str, help="File path for the MSE ARQMath Dataset.", required=True)
-
     args = vars(parser.parse_args())
     clef_home_directory_file_path = (args['ds'])
     dr = DataReaderRecord(clef_home_directory_file_path)
