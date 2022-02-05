@@ -1,5 +1,5 @@
-# ARQMath Clef 2020
-This code provide a simple data reader for [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/) lab at [CLEF 2020](https://clef2020.clef-initiative.eu/). 
+# ARQMath Lab at CLEF 2020 to 2022
+This code provide a simple data reader for [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/). 
 
 ## Getting Started
 
