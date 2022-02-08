@@ -91,43 +91,27 @@ def find_missed_formulas_comments(comment_file_path, latex_dir):
     return lst_missed_formula_ids
 
 
-def write_missed_ids_to_file(lst_formulas, missed_id_file_path, source_root):
+def write_missed_ids_to_file(lst_formulas, missed_id_file_path):
     """
     Writing the missed formula ids to file with each line showing one formula id
     @param lst_formulas: list of missed formula ids
     @param missed_id_file_paths: file to save the missed ids
     @param source_root: directory to save the file
     """
-    file = open(source_root + missed_id_file_path, "w")
+    file = open(missed_id_file_path, "w")
     for formula_id in lst_formulas:
         file.write(str(formula_id) + "\n")
     file.close()
 
 
-def get_file_missed_formulas_post_file(source_root, missed_id_file_path, missed_post_file_path):
+def get_file_missed_formulas_post_file(post_xml_file, latex_dir, missed_id_file_path, missed_post_file_path):
     # Get list of missed formula ids from post file and write to file
-    lst_missed_formula_ids, missed_post_ids = find_missed_formulas_post(source_root + "Posts.V1.2.xml",
-                                                       source_root + "latex_representation_v3/")
-    write_missed_ids_to_file(lst_missed_formula_ids, missed_id_file_path, source_root)
-    write_missed_ids_to_file(missed_post_ids, missed_post_file_path, source_root)
+    lst_missed_formula_ids, missed_post_ids = find_missed_formulas_post(post_xml_file,latex_dir)
+    write_missed_ids_to_file(lst_missed_formula_ids, missed_id_file_path)
+    write_missed_ids_to_file(missed_post_ids, missed_post_file_path)
 
 
-def get_file_missed_formulas_comment_file(source_root, missed_id_file_path):
+def get_file_missed_formulas_comment_file(comment_xml_file, latex_dir, missed_id_file_path):
     # Get list of missed formula ids from comment file and write to file
-    lst_missed_formula_ids = find_missed_formulas_comments(source_root + "Comments.V1.2.xml",
-                                                           source_root + "latex_representation_v3/")
-    write_missed_ids_to_file(lst_missed_formula_ids, missed_id_file_path, source_root)
-
-
-def main():
-    source_root = "/home/"
-
-    # Getting missed ids from post file
-    get_file_missed_formulas_post_file(source_root, "missed_formula_ids_arqmath2_post.tsv",
-                                       "missed_post_ids_arqmath2_post.tsv")
-    # Getting missed ids from comment file
-    get_file_missed_formulas_comment_file(source_root, "missed_formula_ids_arqmath2_comment.tsv")
-
-
-if __name__ == '__main__':
-    main()
+    lst_missed_formula_ids = find_missed_formulas_comments(comment_xml_file, latex_dir)
+    write_missed_ids_to_file(lst_missed_formula_ids, missed_id_file_path)
