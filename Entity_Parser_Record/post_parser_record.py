@@ -97,9 +97,8 @@ class PostParserRecord:
                                                        comment_count, last_edit_date, last_activity_date,
                                                        last_editor_user_id, community_owned_date,
                                                        last_editor_display_name, related_post, comment_list, vote_list,
-                                                       edit_list, user, title, lst_tags,
+                                                       user, title, lst_tags,
                                                        accepted_answer_id, answer_count, favourite_count, closed_date)
-
             elif post_type_id == 2:
                 parent_id = int(attr_dic["ParentId"])
                 answer = Answer(post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
