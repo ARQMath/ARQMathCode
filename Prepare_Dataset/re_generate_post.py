@@ -5,30 +5,31 @@ import codecs
 import re
 from bs4 import BeautifulSoup
 from xml.dom import minidom
-from difflib import SequenceMatcher
 import jellyfish
-# from Entity_Parser_Record.comment_parser_record import CommentParserRecord
-def find_patterns_in_text(formula_double_dollar, input_text, formula_counter, formula_index_map, start_pattern, end_pattern):
-    for string in formula_double_dollar:
-        if "FXXF_" in string:
-            continue
+from Entity_Parser_Record.comment_parser_record import CommentParserRecord
 
-        original_formula = start_pattern + string + end_pattern
-        fake_text = "FXXF_" + str(formula_counter)
-        formula_index_map[fake_text] = original_formula
-        input_text = input_text.replace(original_formula, " " + fake_text + " ", 1)
-        formula_counter += 1
-    return input_text, formula_counter, formula_index_map
+
+def read_missed_ids(file_path):
+    # Reading the missing formula ids file
+    lst_formula_missed_lst = []
+    with open(file_path, mode='r', encoding="utf-8") as file:
+        line = file.readline()
+        while line:
+            formula_id = int(line)
+            lst_formula_missed_lst.append(formula_id)
+            line = file.readline()
+    return lst_formula_missed_lst
 
 
 def read_all_formula_files(formula_file_path):
     """
-        Takes in formula file path and read it line by line and return two dictionaries:
-        dic_res:
-            key: post id, value: dictionary of (formula_id, formula_value)
-        dic_id_type:
-            key: formula_id, formula_type (title, answer, question)
-        not that this class is for post preparation so there is no type comment
+        Takes in formula file path and read it line by line and return three dictionaries:
+        dic_formula_id_latex:
+            key: formula id id, value: latex representation
+        dic_formula_post_type:
+            key: formula_id, value post type : title, answer, question, or comment
+        dic_formula_id_post_id:
+            key: formula id, value post or comment id
     """
     dic_formula_id_latex = {}
     dic_formula_post_type = {}
@@ -48,18 +49,77 @@ def read_all_formula_files(formula_file_path):
     return dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id
 
 
+def get_missed_ids_information(dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id,
+                               lst_missed_formulas):
+    # Just keep information about missing formula ids
+    res_dic_formula_id_latex = {}
+    res_dic_formula_post_type = {}
+    res_dic_formula_id_post_id = {}
+    for formula_id in lst_missed_formulas:
+        res_dic_formula_id_latex[formula_id] = dic_formula_id_latex[formula_id]
+        res_dic_formula_post_type[formula_id] = dic_formula_post_type[formula_id]
+        post_id = dic_formula_id_post_id[formula_id]
+        if post_id in res_dic_formula_id_post_id:
+            res_dic_formula_id_post_id[post_id].append(formula_id)
+        else:
+            res_dic_formula_id_post_id[post_id] = [formula_id]
+    return res_dic_formula_id_latex, res_dic_formula_post_type, res_dic_formula_id_post_id
+
+
+def check_removing_backslash_space(formula, lst_not_found_formulas):
+    """
+    For some of the formulas in the xml file, the correct LaTex was not extracted having extra space or backslash
+    This method seeks to find if removing these characters will find the similar formulas
+    """
+    formula = formula.replace(" ", "", formula.count(" "))
+    formula = formula.replace("\\", "", formula.count("\\"))
+    for i in range(0, len(lst_not_found_formulas)):
+        not_found_formula = lst_not_found_formulas[i]
+        not_found_formula = not_found_formula.replace(" ", "", formula.count(" "))
+        not_found_formula = not_found_formula.replace("\\", "", formula.count("\\"))
+        if formula == not_found_formula:
+            return lst_not_found_formulas[i]
+    return None
+
+
+def find_simlar_formula(formula, lst_not_found_formulas):
+    """
+    If removing the backslash and spaces does not help, this method returns the most similar formula
+    from those that are not annotated to the current formula that we are trying to annotate
+    """
+    dic_sim = {}
+    for i in range(0, len(lst_not_found_formulas)):
+        sim = jellyfish.levenshtein_distance(formula, lst_not_found_formulas[i])
+        dic_sim[i] = sim
+    dic_sim = dict(sorted(dic_sim.items(), key=lambda item: item[1], reverse=True))
+    return lst_not_found_formulas[list(dic_sim.keys())[0]]
+
+
 def check_existence(dic_find_id):
     lst_index = list(set(dic_find_id.values()))
-    if len(lst_index)>1:
+    if len(lst_index) > 1:
         return True
-    elif lst_index[0]==-1:
+    elif lst_index[0] == -1:
         return False
     return True
 
 
-def get_list_of_notassed_formula(input_text):
+def replace_formula_with_token(formula_double_dollar, input_text, formula_counter, formula_index_map, start_pattern,
+                               end_pattern):
+    for string in formula_double_dollar:
+        if "FXXF_" in string:
+            continue
+        original_formula = start_pattern + string + end_pattern
+        fake_text = "FXXF_" + str(formula_counter)
+        formula_index_map[fake_text] = original_formula
+        input_text = input_text.replace(original_formula, " " + fake_text + " ", 1)
+        formula_counter += 1
+    return input_text, formula_counter, formula_index_map
+
+
+def get_list_not_annotated_formula(input_text):
     """
-    This method takes in a text and extract all the formulas inside it in a list of file.
+    This method takes in a text and extract all the formulas that are not annotated with id in the file
     """
 
     "first removes the new lines all tne \n in the text"
@@ -97,23 +157,25 @@ def get_list_of_notassed_formula(input_text):
     Here we check the 5 patterns
     """
     formula_double_dollar = re.findall('<span class="math-container">\$\$(.+?)\$\$</span>', input_text)
-    input_text, counter, formula_index_map = find_patterns_in_text(formula_double_dollar,
-                                                                   input_text, counter, formula_index_map,
-                                                                   '<span class="math-container">$$', "$$</span>")
+    input_text, counter, formula_index_map = replace_formula_with_token(formula_double_dollar,
+                                                                        input_text, counter, formula_index_map,
+                                                                        '<span class="math-container">$$', "$$</span>")
     formula_double_dollar = re.findall('<span class="math-container">\$(.+?)\$</span>', input_text)
-    input_text, counter, formula_index_map = find_patterns_in_text(formula_double_dollar,
-                                                                   input_text, counter, formula_index_map,
-                                                                   '<span class="math-container">$', '$</span>')
+    input_text, counter, formula_index_map = replace_formula_with_token(formula_double_dollar,
+                                                                        input_text, counter, formula_index_map,
+                                                                        '<span class="math-container">$', '$</span>')
     formula_double_dollar = re.findall('<span class="math-container">(.+?)</span>', input_text)
-    input_text, counter, formula_index_map = find_patterns_in_text(formula_double_dollar,
-                                                                   input_text, counter, formula_index_map,
-                                                                   '<span class="math-container">', '</span>')
+    input_text, counter, formula_index_map = replace_formula_with_token(formula_double_dollar,
+                                                                        input_text, counter, formula_index_map,
+                                                                        '<span class="math-container">', '</span>')
     formula_double_dollar = re.findall('\$\$(.+?)\$\$', input_text)
-    input_text, counter, formula_index_map = find_patterns_in_text(formula_double_dollar,
-                                                                   input_text, counter, formula_index_map, "$$", "$$")
+    input_text, counter, formula_index_map = replace_formula_with_token(formula_double_dollar,
+                                                                        input_text, counter, formula_index_map, "$$",
+                                                                        "$$")
     formula_double_dollar = re.findall('\$(.+?)\$', input_text)
-    input_text, counter, formula_index_map = find_patterns_in_text(formula_double_dollar,
-                                                                   input_text, counter, formula_index_map, "$", "$")
+    input_text, counter, formula_index_map = replace_formula_with_token(formula_double_dollar,
+                                                                        input_text, counter, formula_index_map, "$",
+                                                                        "$")
     """
     formula_index_map now contains all the formula, we should sort them based on their order appearance in the text; 
     e.g.: 
@@ -136,29 +198,8 @@ def get_list_of_notassed_formula(input_text):
     return latex_formulas
 
 
-def check_removing_backslash_space(formula, lst_not_found_formulas):
-    formula = formula.replace(" ","",formula.count(" "))
-    formula = formula.replace("\\","",formula.count("\\"))
-    for i in range(0, len(lst_not_found_formulas)):
-        not_found_formula = lst_not_found_formulas[i]
-        not_found_formula = not_found_formula.replace(" ", "", formula.count(" "))
-        not_found_formula = not_found_formula.replace("\\", "", formula.count("\\"))
-        if formula == not_found_formula:
-            return lst_not_found_formulas[i]
-    return None
-
-
-def find_simlar_formula(formula, lst_not_found_formulas):
-    dic_sim = {}
-    for i in range(0, len(lst_not_found_formulas)):
-        sim = jellyfish.levenshtein_distance(formula, lst_not_found_formulas[i])
-        dic_sim[i] = sim
-    dic_sim = dict(sorted(dic_sim.items(), key=lambda item: item[1], reverse=True))
-    return lst_not_found_formulas[list(dic_sim.keys())[0]]
-
-
-
-def set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id, text_type):
+def set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id, text_type,
+                 dic_latex_wrong, lst_fixed_id):
     """
     Input:
         text: the input text that its formulas need to be converted to Arqmath notation, where each formula has an
@@ -169,7 +210,7 @@ def set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic
         text_type: shows the current text (first input) is a title, question, answer or comment
     """
 
-    "if there is not formula to this post just return the text"
+    "This means all formulas in this post are annotated with if before"
     if post_id not in dic_formula_id_post_id:
         return text
 
@@ -183,6 +224,8 @@ def set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic
             we do not know which one to replace (replace the original formula with the math-container tag one)
         """
         if dic_formula_post_type[formula_id] != text_type:
+            continue
+        if formula_id in lst_fixed_id:
             continue
         "the original formula"
         formula = dic_formula_id_latex[formula_id]
@@ -225,41 +268,40 @@ def set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic
                     temp = text[0:find_inx]
                     text = text[find_inx:]
                     result_text += temp.replace(item[0], to_write_string + formula + "</span>")
+                    lst_fixed_id.append(formula_id)
                     break
         else:
-            lst_not_found_formulas = get_list_of_notassed_formula(text)
+            lst_not_found_formulas = get_list_not_annotated_formula(text)
+            if lst_not_found_formulas is None or len(lst_not_found_formulas) == 0:
+                break
             matched = check_removing_backslash_space(formula, lst_not_found_formulas)
             if matched is None:
                 matched = find_simlar_formula(formula, lst_not_found_formulas)
+            dic_latex_wrong[formula_id] = (formula, matched)
+
             dic_formula_id_latex[formula_id] = matched
-            return set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id, text_type)
+            return set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id,
+                                text_type, dic_latex_wrong, lst_fixed_id)
     return result_text + text
 
 
-def get_missed_ids_information(dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id, lst_missed_formulas):
-    res_dic_formula_id_latex = {}
-    res_dic_formula_post_type = {}
-    res_dic_formula_id_post_id = {}
-    for formula_id in lst_missed_formulas:
-        res_dic_formula_id_latex[formula_id] = dic_formula_id_latex[formula_id]
-        res_dic_formula_post_type[formula_id] = dic_formula_post_type[formula_id]
-        post_id = dic_formula_id_post_id[formula_id]
-        if post_id in res_dic_formula_id_post_id:
-            res_dic_formula_id_post_id[post_id].append(formula_id)
-        else:
-            res_dic_formula_id_post_id[post_id] = [formula_id]
-    return res_dic_formula_id_latex, res_dic_formula_post_type, res_dic_formula_id_post_id
-
-
-def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_latex_index_directory, new_xml_file_path, lst_missed_formulas):
+def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_latex_index_directory, new_xml_file_path,
+                                  lst_missed_formulas):
     """First reads the formulas and save
     @param xml_post_link_file_path: Original post file from Archive
-    @param formula_index_file_path: the formula index file (the tsv file containing the latex)
+    @param formula_latex_index_directory: the formula index file (the tsv file containing the latex)
     @param new_xml_file_path: the result post file that will be used in ARQMath containing posts from 2010 to 2018 with
-    annotated formulas.
+    annotated formulas
+    @param lst_missed_formulas: list of missed formula ids
     """
-    dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id = read_all_formula_files(formula_latex_index_directory)
-    dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id = get_missed_ids_information(dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id, lst_missed_formulas)
+    dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id = read_all_formula_files(
+        formula_latex_index_directory)
+    # remove uncessary information from the the dictionary and just keep information about missing formula ids
+    dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id = get_missed_ids_information(
+        dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id, lst_missed_formulas)
+
+    wrong_extracted_latex = {}
+
     "Creating the root for the new post file [the one for ARQMath]"
     root = ET.Element("posts")
 
@@ -271,20 +313,8 @@ def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_latex_index_d
         for post in all_post:
             attr_dic = post.attrs
             post_id = int(attr_dic["id"])
-
             post_type_id = int(attr_dic["posttypeid"])
-            # if post_id == 1653578:
-            #     input("wait here")
-            "There are 4 post with type id 7 that is not defined in the collection readme file, we just eliminated them"
-            if not (post_type_id == 1 or post_type_id == 2):
-                continue
-
             creation_date = (attr_dic["creationdate"])
-
-            "the post from 2019 were eliminated"
-            if int(creation_date.split("T")[0].split("-")[0]) >= 2019:
-                continue
-
             sub = ET.SubElement(root, "row")
             "All these attributes are common in both questions and answers"
             sub.set('Id', str(post_id))
@@ -308,7 +338,7 @@ def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_latex_index_d
                 sub.set('CommunityOwnedDate', attr_dic["communityOwnedDate"])
             if "lastEditorDisplayName" in attr_dic:
                 sub.set('LastEditorDisplayName', attr_dic["lastEditorDisplayName"])
-
+            lst_fixed_id = []
             "If the post is a question"
             if post_type_id == 1:  # Question
 
@@ -317,14 +347,16 @@ def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_latex_index_d
                 "editors "
 
                 title = title.replace("\n", " ", title.count("\n"))
-                title = set_formulas(title, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id, "title")
+                title = set_formulas(title, post_id, dic_formula_id_latex, dic_formula_post_type,
+                                     dic_formula_id_post_id, "title", wrong_extracted_latex, lst_fixed_id)
                 title = title.replace("\n", " ", title.count("\n"))
                 sub.set('Title', title)
 
                 body = (attr_dic["body"])
                 body = body.replace("\n", " ", body.count("\n"))
                 "Annotating the formulas"
-                body = set_formulas(body, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id, "question")
+                body = set_formulas(body, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id,
+                                    "question", wrong_extracted_latex, lst_fixed_id)
                 body = body.replace("\n", " ", body.count("\n"))
                 sub.set('Body', body)
 
@@ -346,7 +378,8 @@ def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_latex_index_d
                 body = (attr_dic["body"])
                 body = body.replace("\n", " ", body.count("\n"))
                 "Annotating the formulas"
-                body = set_formulas(body, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id, "answer")
+                body = set_formulas(body, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id,
+                                    "answer", wrong_extracted_latex, lst_fixed_id)
                 body = body.replace("\n", " ", body.count("\n"))
                 sub.set('Body', body)
                 sub.set('ParentId', attr_dic["parentid"])
@@ -355,8 +388,15 @@ def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_latex_index_d
     with open(new_xml_file_path, "w", encoding="utf-8") as f:
         f.write(xml_str)
 
+    with open("replaced_latex_post.tsv", "w", newline='', encoding="utf-8") as new_file:
+        csv_writer = csv.writer(new_file, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
+        for formula_id in wrong_extracted_latex:
+            csv_writer.writerow(
+                [str(formula_id), wrong_extracted_latex[formula_id][0], wrong_extracted_latex[formula_id][1]])
 
-def convert_mse_arqmath_comment_file(comments_file_path, formula_latex_index_directory, result_file_path):
+
+def convert_mse_arqmath_comment_file(comments_file_path, formula_latex_index_directory, result_file_path,
+                                     lst_missed_formulas):
     """
     Takes in the Original comment file from MSE Archive, the extracted formula tsv file and the results file path
     for the new comment file and do the conversion.
@@ -364,26 +404,29 @@ def convert_mse_arqmath_comment_file(comments_file_path, formula_latex_index_dir
     @param formula_index_file_path: The extracted formulas tsv file
     @param result_file_path: The new xml comment file path.
     """
-    map_formulas, map_id_type = read_formula_file(formula_latex_index_directory)
+    dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id = read_all_formula_files(
+        formula_latex_index_directory)
+    # remove uncessary information from the the dictionary and just keep information about missing formula ids
+    dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id = get_missed_ids_information(
+        dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id, lst_missed_formulas)
+
     comment_parser = CommentParserRecord(comments_file_path)
     root = ET.Element("comments")
-    for post_id in comment_parser.map_of_comments_for_post:
-        comment_lst = comment_parser.map_of_comments_for_post[post_id]
-        for comment in comment_lst:
-            creation_date = comment.creation_date
-            if creation_date is None:
-                continue
-            if int(creation_date.split("T")[0].split("-")[0]) == 2019:
-                continue
-            score = comment.score
-            text = comment.text
-            post_id = comment.related_post_id
-            user_id = comment.user_id
-            text = set_formulas(text, comment.id, map_formulas, map_id_type, "comment")
-            sub = ET.SubElement(root, "row")
-            sub.set('Id', str(comment.id))
-            sub.set('PostId', str(post_id))
-            sub.set('Text', text)
+    wrong_extracted_latex = {}
+    for comment_id in comment_parser.map_just_comments:
+        lst_fixed_id = []
+        comment = comment_parser.map_just_comments[comment_id]
+        creation_date = comment.creation_date
+        score = comment.score
+        text = comment.text
+        post_id = comment.related_post_id
+        user_id = comment.user_id
+        text = set_formulas(text, comment.id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id,
+                            "comment", wrong_extracted_latex, lst_fixed_id)
+        sub = ET.SubElement(root, "row")
+        sub.set('Id', str(comment.id))
+        sub.set('PostId', str(post_id))
+        sub.set('Text', text)
         if score is not None:
             sub.set('Score', str(score))
         if creation_date is not None:
@@ -392,28 +435,28 @@ def convert_mse_arqmath_comment_file(comments_file_path, formula_latex_index_dir
             sub.set('UserId', str(user_id))
 
     xml_str = minidom.parseString(ET.tostring(root)).toprettyxml(indent="   ")
-    with open(result_file_path, "w") as f:
+    with open(result_file_path, "w", encoding="utf-8") as f:
         f.write(xml_str)
-
-
-def read_missed_ids(file_path):
-    lst_formula_missed_lst = []
-    with open(file_path, mode='r', encoding="utf-8") as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter='\t')
-        for row in csv_reader:
-            formula_id = int(row[0])
-            lst_formula_missed_lst.append(formula_id)
-    return lst_formula_missed_lst
+    with open("replaced_latex_comment.tsv", "w", newline='', encoding="utf-8") as new_file:
+        csv_writer = csv.writer(new_file, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
+        for formula_id in wrong_extracted_latex:
+            csv_writer.writerow(
+                [str(formula_id), wrong_extracted_latex[formula_id][0], wrong_extracted_latex[formula_id][1]])
 
 
 def main():
-    l_home = "/home/bm3302/"
-    lst_missed_formulas = read_missed_ids(home+"missed_formula_ids_arqmath2_post.tsv")
+    home = "/home/"
+
+
     "Conversion of post file"
+    lst_missed_formulas = read_missed_ids(home+"missed_formula_ids_arqmath2_post.tsv")
     convert_mse_arqmath_post_file(home+"Posts.V1.2.xml", home+"latex_representation_v3",
                                   home+"Posts.V1.3.xml", lst_missed_formulas)
+
     "Conversion of comment file"
-    # convert_mse_arqmath_comment_file(home+"Comments.V1.2.xml", home+"latex_representation_v3", "Comments.V1.3.xml")
+    lst_missed_formulas = read_missed_ids(home + "missed_formula_ids_arqmath2_comment.tsv")
+    convert_mse_arqmath_comment_file(home + "Comments.V1.2.xml", home + "latex_representation_v3", "Comments.V1.3.xml",
+                                     lst_missed_formulas)
 
 
 if __name__ == '__main__':
