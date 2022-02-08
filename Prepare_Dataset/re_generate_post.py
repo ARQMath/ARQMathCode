@@ -425,11 +425,10 @@ def convert_mse_arqmath_comment_file(comments_file_path, formula_latex_index_dir
                 [str(formula_id), wrong_extracted_latex[formula_id][0], wrong_extracted_latex[formula_id][1]])
 
 
-def regenrate_xml_files(home):
-    "Conversion of post file"
-    lst_missed_formulas = read_missed_ids(home+"missed_formula_ids_arqmath2_post.tsv")
-    convert_mse_arqmath_post_file(home+"Posts.V1.2.xml", home+"latex_representation_v3",
-                                  home+"Posts.V1.3.xml", lst_missed_formulas)
+def regenrate_xml_files(home, missed_formula_id_path, old_post_xml, new_post_xml, latex_dir):
+    #Conversion of post file
+    lst_missed_formulas = read_missed_ids(missed_formula_id_path)
+    convert_mse_arqmath_post_file(old_post_xml, latex_dir, new_post_xml, lst_missed_formulas)
 
     "Conversion of comment file"
     # lst_missed_formulas = read_missed_ids(home + "missed_formula_ids_arqmath2_comment.tsv")
@@ -438,7 +437,9 @@ def regenrate_xml_files(home):
 
 
 def main():
-    regenrate_xml_files("/home/")
+    regenrate_xml_files("/home/bm3302/", "/home/bm3302/missed_formula_ids_arqmath2_post.tsv",
+                        "/home/bm3302/Posts.V1.2.xml", "/home/bm3302/Posts.V1.3.xml",
+                        "home/bm3302/latex_representation_v3")
 
 
 if __name__ == '__main__':

@@ -57,6 +57,7 @@ def extract_missed_formulas_from_text(lst_formulas, lst_missed_formula_ids, targ
 def find_missed_formulas_post(post_file_path, latex_dir):
     pr, dic_formulas = read_arqmath_data_post(post_file_path, latex_dir)
     lst_missed_formula_ids = []
+    lst_missed_post_ids = []
     for post_id in dic_formulas:
         lst_formulas = dic_formulas[post_id]
         for formula_id in lst_formulas:
@@ -70,9 +71,10 @@ def find_missed_formulas_post(post_file_path, latex_dir):
                 post = pr.map_just_answers[post_id]
                 target = post.body
             else:
+                lst_missed_post_ids.append(post_id)
                 continue
             lst_missed_formula_ids = extract_missed_formulas_from_text(lst_formulas, lst_missed_formula_ids, target)
-    return lst_missed_formula_ids
+    return lst_missed_formula_ids, list(set(lst_missed_post_ids))
 
 
 def find_missed_formulas_comments(comment_file_path, latex_dir):
@@ -102,11 +104,12 @@ def write_missed_ids_to_file(lst_formulas, missed_id_file_path, source_root):
     file.close()
 
 
-def get_file_missed_formulas_post_file(source_root, missed_id_file_path):
+def get_file_missed_formulas_post_file(source_root, missed_id_file_path, missed_post_file_path):
     # Get list of missed formula ids from post file and write to file
-    lst_missed_formula_ids = find_missed_formulas_post(source_root + "Posts.V1.2.xml",
+    lst_missed_formula_ids, missed_post_ids = find_missed_formulas_post(source_root + "Posts.V1.2.xml",
                                                        source_root + "latex_representation_v3/")
     write_missed_ids_to_file(lst_missed_formula_ids, missed_id_file_path, source_root)
+    write_missed_ids_to_file(missed_post_ids, missed_post_file_path, source_root)
 
 
 def get_file_missed_formulas_comment_file(source_root, missed_id_file_path):
@@ -120,7 +123,8 @@ def main():
     source_root = "/home/"
 
     # Getting missed ids from post file
-    get_file_missed_formulas_post_file(source_root, "missed_formula_ids_arqmath2_post.tsv")
+    get_file_missed_formulas_post_file(source_root, "missed_formula_ids_arqmath2_post.tsv",
+                                       "missed_post_ids_arqmath2_post.tsv")
     # Getting missed ids from comment file
     get_file_missed_formulas_comment_file(source_root, "missed_formula_ids_arqmath2_comment.tsv")
 
