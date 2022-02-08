@@ -210,7 +210,7 @@ def set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic
         text_type: shows the current text (first input) is a title, question, answer or comment
     """
 
-    "This means all formulas in this post are annotated with if before"
+    "This means all formulas in this post are annotated with id before"
     if post_id not in dic_formula_id_post_id:
         return text
 
