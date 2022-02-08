@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python3 test_regenerate_xml.py "/home/bm3302/"

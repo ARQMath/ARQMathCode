@@ -3,8 +3,8 @@ import os
 
 from bs4 import BeautifulSoup
 
-from Entity_Parser_Record.post_parser_record import PostParserRecord
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
+from Entity_Parser_Record.post_parser_record import PostParserRecord
 
 
 def read_formula_file(directory, is_comment):
