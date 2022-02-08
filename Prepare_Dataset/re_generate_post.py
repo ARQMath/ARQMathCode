@@ -5,7 +5,6 @@ import codecs
 import re
 from bs4 import BeautifulSoup
 from xml.dom import minidom
-import jellyfish
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
 
 
@@ -66,7 +65,7 @@ def get_missed_ids_information(dic_formula_id_latex, dic_formula_post_type, dic_
     return res_dic_formula_id_latex, res_dic_formula_post_type, res_dic_formula_id_post_id
 
 
-def check_removing_backslash_space(formula, lst_not_found_formulas):
+def check_removing_backslash_space_lower(formula, lst_not_found_formulas):
     """
     For some of the formulas in the xml file, the correct LaTex was not extracted having extra space or backslash
     This method seeks to find if removing these characters will find the similar formulas
@@ -80,19 +79,6 @@ def check_removing_backslash_space(formula, lst_not_found_formulas):
         if formula == not_found_formula:
             return lst_not_found_formulas[i]
     return None
-
-
-def find_simlar_formula(formula, lst_not_found_formulas):
-    """
-    If removing the backslash and spaces does not help, this method returns the most similar formula
-    from those that are not annotated to the current formula that we are trying to annotate
-    """
-    dic_sim = {}
-    for i in range(0, len(lst_not_found_formulas)):
-        sim = jellyfish.levenshtein_distance(formula, lst_not_found_formulas[i])
-        dic_sim[i] = sim
-    dic_sim = dict(sorted(dic_sim.items(), key=lambda item: item[1], reverse=True))
-    return lst_not_found_formulas[list(dic_sim.keys())[0]]
 
 
 def check_existence(dic_find_id):
@@ -168,14 +154,6 @@ def get_list_not_annotated_formula(input_text):
     input_text, counter, formula_index_map = replace_formula_with_token(formula_double_dollar,
                                                                         input_text, counter, formula_index_map,
                                                                         '<span class="math-container">', '</span>')
-    formula_double_dollar = re.findall('\$\$(.+?)\$\$', input_text)
-    input_text, counter, formula_index_map = replace_formula_with_token(formula_double_dollar,
-                                                                        input_text, counter, formula_index_map, "$$",
-                                                                        "$$")
-    formula_double_dollar = re.findall('\$(.+?)\$', input_text)
-    input_text, counter, formula_index_map = replace_formula_with_token(formula_double_dollar,
-                                                                        input_text, counter, formula_index_map, "$",
-                                                                        "$")
     """
     formula_index_map now contains all the formula, we should sort them based on their order appearance in the text; 
     e.g.: 
@@ -233,30 +211,7 @@ def set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic
         "the string that will be replaced by the original formula, it has math-container tag and formula id"
         to_write_string = "<span class=\"math-container\" id=\"" + str(formula_id) + "\">"
 
-        """Each formula can be located in the text in one this 6 form, (text6) should not happen but 
-        just added for the case. Note that in the formula index file from which we created the map 
-        we only have the latex of formula not how the formula was located in the text. 
-
-        For example a formula can be like "<span class="math-container> $a+b$ </span>" in the original MSE dataset
-        but we only keep a+b.
-
-        So we check which of these 6 format was the one that the original formula was written in, and also note in the 
-        map, formulas are sorted based on their order in the original, so we use these 6 format, find their first
-        occurrence and replace them with our desired text.
-        """
-        map_index = {}
-        text1 = "<span class=\"math-container\">$$" + formula + "$$</span>"
-        map_index[text1] = text.find(text1)
-        text2 = "<span class=\"math-container\">$" + formula + "$</span>"
-        map_index[text2] = text.find(text2)
-        text3 = "<span class=\"math-container\">" + formula + "</span>"
-        map_index[text3] = text.find(text3)
-        text4 = "$$" + formula + "$$"
-        map_index[text4] = text.find(text4)
-        text5 = "$" + formula + "$"
-        map_index[text5] = text.find(text5)
-        text6 = formula
-        map_index[text6] = text.find(text6)
+        map_index = match_to_pattern(formula, text)
 
         exists = check_existence(map_index)
 
@@ -274,15 +229,41 @@ def set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic
             lst_not_found_formulas = get_list_not_annotated_formula(text)
             if lst_not_found_formulas is None or len(lst_not_found_formulas) == 0:
                 break
-            matched = check_removing_backslash_space(formula, lst_not_found_formulas)
-            if matched is None:
-                matched = find_simlar_formula(formula, lst_not_found_formulas)
-            dic_latex_wrong[formula_id] = (formula, matched)
-
-            dic_formula_id_latex[formula_id] = matched
-            return set_formulas(text, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id,
-                                text_type, dic_latex_wrong, lst_fixed_id)
+            matched = check_removing_backslash_space_lower(formula, lst_not_found_formulas)
+            if matched:
+                dic_latex_wrong[formula_id] = (formula, matched)
+                dic_formula_id_latex[formula_id] = matched
+                return set_formulas(result_text + text, post_id, dic_formula_id_latex, dic_formula_post_type, dic_formula_id_post_id,
+                                    text_type, dic_latex_wrong, lst_fixed_id)
     return result_text + text
+
+
+def match_to_pattern(formula, text):
+    """Each formula can be located in the text in one this 6 form, (text6) should not happen but
+        just added for the case. Note that in the formula index file from which we created the map
+        we only have the latex of formula not how the formula was located in the text.
+
+        For example a formula can be like "<span class="math-container> $a+b$ </span>" in the original MSE dataset
+        but we only keep a+b.
+
+        So we check which of these 6 format was the one that the original formula was written in, and also note in the
+        map, formulas are sorted based on their order in the original, so we use these 6 format, find their first
+        occurrence and replace them with our desired text.
+        """
+    map_index = {}
+    text1 = "<span class=\"math-container\">$$" + formula + "$$</span>"
+    map_index[text1] = text.find(text1)
+    text2 = "<span class=\"math-container\">$" + formula + "$</span>"
+    map_index[text2] = text.find(text2)
+    text3 = "<span class=\"math-container\">" + formula + "</span>"
+    map_index[text3] = text.find(text3)
+    text4 = "$$" + formula + "$$"
+    map_index[text4] = text.find(text4)
+    text5 = "$" + formula + "$"
+    map_index[text5] = text.find(text5)
+    text6 = formula
+    map_index[text6] = text.find(text6)
+    return map_index
 
 
 def convert_mse_arqmath_post_file(xml_post_link_file_path, formula_latex_index_directory, new_xml_file_path,
@@ -444,19 +425,20 @@ def convert_mse_arqmath_comment_file(comments_file_path, formula_latex_index_dir
                 [str(formula_id), wrong_extracted_latex[formula_id][0], wrong_extracted_latex[formula_id][1]])
 
 
-def main():
-    home = "/home/"
-
-
+def regenrate_xml_files(home):
     "Conversion of post file"
     lst_missed_formulas = read_missed_ids(home+"missed_formula_ids_arqmath2_post.tsv")
     convert_mse_arqmath_post_file(home+"Posts.V1.2.xml", home+"latex_representation_v3",
                                   home+"Posts.V1.3.xml", lst_missed_formulas)
 
     "Conversion of comment file"
-    lst_missed_formulas = read_missed_ids(home + "missed_formula_ids_arqmath2_comment.tsv")
-    convert_mse_arqmath_comment_file(home + "Comments.V1.2.xml", home + "latex_representation_v3", "Comments.V1.3.xml",
-                                     lst_missed_formulas)
+    # lst_missed_formulas = read_missed_ids(home + "missed_formula_ids_arqmath2_comment.tsv")
+    # convert_mse_arqmath_comment_file(home + "Comments.V1.2.xml", home + "latex_representation_v3", "Comments.V1.3.xml",
+    #                                  lst_missed_formulas)
+
+
+def main():
+    regenrate_xml_files("/home/")
 
 
 if __name__ == '__main__':
