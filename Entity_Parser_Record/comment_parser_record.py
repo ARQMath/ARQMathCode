@@ -9,6 +9,7 @@ class CommentParserRecord:
     def __init__(self, xml_comment_file_path):
 
         self.map_of_comments_for_post = {}
+        self.map_just_comments = {}
         tree = ET.parse(xml_comment_file_path)
         root = tree.getroot()
         for child in root:
@@ -28,6 +29,7 @@ class CommentParserRecord:
                 creation_date = (attr_dic["CreationDate"])
 
             comment = Comment(comment_id, post_id, text, score, user_id, creation_date)
+            self.map_just_comments[comment_id] = comment
             if post_id in self.map_of_comments_for_post:
                 self.map_of_comments_for_post[post_id].append(comment)
             else:
