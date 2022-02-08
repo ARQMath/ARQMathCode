@@ -103,7 +103,7 @@ class PostParserRecord:
                 parent_id = int(attr_dic["ParentId"])
                 answer = Answer(post_id, creation_date, score, view_count, body, owner_user_id, comment_count,
                                 last_edit_date, last_activity_date, last_editor_user_id, community_owned_date,
-                                last_editor_display_name, parent_id, comment_list, vote_list, edit_list, user)
+                                last_editor_display_name, parent_id, comment_list, vote_list, user)
 
                 if parent_id in self.map_answers:
                     self.map_answers[parent_id].append(answer)
