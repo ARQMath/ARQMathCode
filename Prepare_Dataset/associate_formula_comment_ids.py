@@ -49,9 +49,9 @@ def manage_already_associated_formulas(cr, csv_writer):
     return dic_formula_id_comment_id
 
 
-def associate_formula_id_with_comment_id(comment_file_path, directory):
+def associate_formula_id_with_comment_id(comment_file_path, directory, accociation_file):
     # this method associate formula ids to comment ids (as tsv file)
-    with open("formula_comment_id.tsv", mode='w') as csv_file:
+    with open(accociation_file, mode='w') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
         # reading xml comment file
@@ -96,4 +96,7 @@ def associate_formula_id_with_comment_id(comment_file_path, directory):
         print(not_found_count)
 
 
-associate_formula_id_with_comment_id("/home/bm3302/Comments.V1.2.xml", "/home/bm3302/latex_representation_v3/")
+comment_file = "/home/bm3302/Comments.V1.2.xml"
+latex_dir = "/home/bm3302/latex_representation_v3/"
+accociation_file = "formula_comment_id.tsv"
+associate_formula_id_with_comment_id(comment_file, latex_dir, accociation_file)
