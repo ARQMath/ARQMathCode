@@ -1,0 +1,1 @@
+pip install git+https://github.com/MIR-MU/TangentCFT.git lxml~=4.5.0 beautifulsoup4~=4.8.2
