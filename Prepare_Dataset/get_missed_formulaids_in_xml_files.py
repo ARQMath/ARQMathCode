@@ -45,7 +45,7 @@ def read_arqmath_data_comment(comment_file_path, latex_dir):
 
 def extract_missed_formulas_from_text(lst_formulas, lst_missed_formula_ids, target):
     for formula_id in lst_formulas:
-        soup = BeautifulSoup(target)
+        soup = BeautifulSoup(target, features="lxml")
         spans = soup.find_all('span', {'class': 'math-container', 'id': str(formula_id)})
         if spans is not None and len(spans) > 0:
             continue
@@ -56,6 +56,7 @@ def extract_missed_formulas_from_text(lst_formulas, lst_missed_formula_ids, targ
 
 def find_missed_formulas_post(post_file_path, latex_dir):
     pr, dic_formulas = read_arqmath_data_post(post_file_path, latex_dir)
+    print("read arqmath data")
     lst_missed_formula_ids = []
     lst_missed_post_ids = []
     for post_id in dic_formulas:
