@@ -60,21 +60,17 @@ def find_missed_formulas_post(post_file_path, latex_dir):
     lst_missed_formula_ids = []
     lst_missed_post_ids = []
     for post_id in dic_formulas:
+        if post_id in pr.map_questions:
+            post = pr.map_questions[post_id]
+            target = post.title + " " + post.body
+        elif post_id in pr.map_just_answers:
+            post = pr.map_just_answers[post_id]
+            target = post.body
+        else:
+            lst_missed_post_ids.append(post_id)
+            continue
         lst_formulas = dic_formulas[post_id]
-        for formula_id in lst_formulas:
-            if post_id in pr.map_questions:
-                post = pr.map_questions[post_id]
-                if formula_id in post.title:
-                    target = post.title
-                else:
-                    target = post.body
-            elif post_id in pr.map_just_answers:
-                post = pr.map_just_answers[post_id]
-                target = post.body
-            else:
-                lst_missed_post_ids.append(post_id)
-                continue
-            lst_missed_formula_ids = extract_missed_formulas_from_text(lst_formulas, lst_missed_formula_ids, target)
+        lst_missed_formula_ids = extract_missed_formulas_from_text(lst_formulas, lst_missed_formula_ids, target)
     return lst_missed_formula_ids, list(set(lst_missed_post_ids))
 
 
