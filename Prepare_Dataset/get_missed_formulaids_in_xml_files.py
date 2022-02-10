@@ -108,6 +108,7 @@ def write_missed_ids_to_file(lst_formulas, missed_id_file_path):
 def get_file_missed_formulas_post_file(post_xml_file, latex_dir, missed_id_file_path, missed_post_file_path):
     # Get list of missed formula ids from post file and write to file
     lst_missed_formula_ids, missed_post_ids = find_missed_formulas_post(post_xml_file,latex_dir)
+    print("writing missing formula ids to a file")
     write_missed_ids_to_file(lst_missed_formula_ids, missed_id_file_path)
     write_missed_ids_to_file(missed_post_ids, missed_post_file_path)
 
