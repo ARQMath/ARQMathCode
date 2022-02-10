@@ -3,7 +3,7 @@ This code provide a data reader for [ARQMath](https://www.cs.rit.edu/~dprl/ARQMa
 
 ## Getting Started
 
-To begin the code, first download and locate the ARQMath Dataset from [here] (https://drive.google.com/drive/folders/1YekTVvfmYKZ8I5uiUMbs21G2mKwF9IAm?usp=sharing).
+To begin the code, first download and locate the ARQMath Dataset from [here](https://drive.google.com/drive/folders/1YekTVvfmYKZ8I5uiUMbs21G2mKwF9IAm?usp=sharing).
 
 Locate the XML file in directory `ARQMath` and use this directory as `ds` parameter for ```post_reader_record.py```.
 
@@ -12,7 +12,9 @@ Use ```post_reader_record.py``` to read the data using a ```DataReaderRecord```.
 The sample commands are shown in ```post_reader_record.py``` to read data such as reading questions with a specific tag, reading answers given from a specific user and generating html view files.
 
 
-Note that the DataReader is used for reading the test collection. In order to read the questions, please use the ```topic_file_reader.py '''.
+Note that the DataReader is used for reading the test collection. In order to read the questions, please use the ```topic_file_reader.py```. The sample commands on available in this file.
+
+## Test Files
 
 
 ## Authors
