@@ -194,13 +194,13 @@ def extract_slt_opt_from_latex_file(file_path, formula_id_index, formula_latex_i
     return conversion_result_slt, conversion_result_opt, lst_failed
 
 
-def convert_tsv_latex_write_ouput(latex_file_path, slt_file_path, opt_file_path):
+def convert_tsv_latex_write_ouput(latex_file_path, file_id, destination_root):
     formula_id_index = 0
     formula_latex_index = 5
     conversion_result_slt, conversion_result_opt, lst_failed = \
-        extract_slt_opt_from_latex_file(latex_file_path, formula_id_index, formula_latex_index)
+        extract_slt_opt_from_latex_file(latex_file_path+"/"+file_id+".tsv", formula_id_index, formula_latex_index)
 
-    with open(slt_file_path, "w", newline='', encoding="utf-8") as result_file:
+    with open(destination_root+"/slt_"+file_id+".tsv", "w", newline='', encoding="utf-8") as result_file:
         csv_writer = csv.writer(result_file, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
         for formula_id in conversion_result_slt:
             slt = conversion_result_slt[formula_id]
@@ -208,7 +208,7 @@ def convert_tsv_latex_write_ouput(latex_file_path, slt_file_path, opt_file_path)
             soup = BeautifulSoup(slt, 'html.parser')
             slt = html.unescape(str(soup))
             csv_writer.writerow([str(formula_id), slt])
-    with open(opt_file_path, "w", newline='', encoding="utf-8") as result_file:
+    with open(destination_root+"/opt_"+file_id+".tsv", "w", newline='', encoding="utf-8") as result_file:
         csv_writer = csv.writer(result_file, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
         for formula_id in conversion_result_opt:
             opt = conversion_result_opt[formula_id]
@@ -216,8 +216,23 @@ def convert_tsv_latex_write_ouput(latex_file_path, slt_file_path, opt_file_path)
             soup = BeautifulSoup(opt, 'html.parser')
             opt = html.unescape(str(soup))
             csv_writer.writerow([str(formula_id), opt])
+    with open(destination_root+"/failed_"+file_id+".tsv", "w", newline='', encoding="utf-8") as result_file:
+        csv_writer = csv.writer(result_file, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
+        for formula_id in lst_failed:
+            csv_writer.writerow([str(formula_id)])
     return lst_failed
 
 
-lst_failed_ids = convert_tsv_latex_write_ouput("1_test_latex.tsv", "1_test_slt.tsv", "1_test_opt.tsv")
-print(len(lst_failed_ids))
+def main():
+    # source root were latex tsv files are located
+    source_root = sys.argv[1]
+    # tsv file id
+    file_id = sys.argv[2]
+    # destination to save slt/opt/failure files
+    destination_root = sys.argv[3]
+    lst_failed_ids = convert_tsv_latex_write_ouput(source_root, file_id, destination_root)
+    print(len(lst_failed_ids))
+
+
+if __name__ == '__main__':
+    main()
