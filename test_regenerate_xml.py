@@ -9,7 +9,7 @@ def test_run(source_root):
     missed_formula_ids_path = "missed_formula_id.txt"
     missed_post_ids_path = "missed_post_id.txt"
     old_file_path = "Posts.V1.2.xml"
-    latex_dir = "latex_representation_v3/"
+    latex_dir = "latex_representation_v2/"
     print("Getting missing formula ids")
     #Get missed ids
     get_file_missed_formulas_post_file(source_root + old_file_path, source_root + latex_dir,
