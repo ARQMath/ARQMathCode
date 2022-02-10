@@ -44,8 +44,8 @@ def read_arqmath_data_comment(comment_file_path, latex_dir):
 
 
 def extract_missed_formulas_from_text(lst_formulas, lst_missed_formula_ids, target):
+    soup = BeautifulSoup(target, features="lxml")
     for formula_id in lst_formulas:
-        soup = BeautifulSoup(target, features="lxml")
         spans = soup.find_all('span', {'class': 'math-container', 'id': str(formula_id)})
         if spans is not None and len(spans) > 0:
             continue
@@ -99,7 +99,7 @@ def write_missed_ids_to_file(lst_formulas, missed_id_file_path):
     @param missed_id_file_paths: file to save the missed ids
     @param source_root: directory to save the file
     """
-    file = open(missed_id_file_path, "w")
+    file = open(missed_id_file_path, "w", encoding="utf-8")
     for formula_id in lst_formulas:
         file.write(str(formula_id) + "\n")
     file.close()
