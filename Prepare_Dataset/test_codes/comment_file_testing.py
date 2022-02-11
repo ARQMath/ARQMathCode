@@ -4,6 +4,8 @@ import random
 import argparse
 import sys
 
+from bs4 import BeautifulSoup
+
 conf_path = os.getcwd()
 sys.path.append(conf_path)
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
@@ -41,6 +43,28 @@ def read_all_formula_files(latex_formula_dir):
     return dic_formula_id_latex
 
 
+def check_all_formulas_located(comment_parser, dic_formula_comment_id):
+    lst_not_located = []
+    for formula_id in dic_formula_comment_id:
+        comment_id = dic_formula_comment_id[formula_id]
+        if comment_id not in comment_parser:
+            lst_not_located.append(formula_id)
+            continue
+        else:
+            comment = comment_parser.map_just_comments[comment_id]
+            text = comment.text
+            soup = BeautifulSoup(text)
+            spans = soup.find_all('span', {'class': 'math-container'})
+            found = False
+            for span in spans:
+                if span.has_attr('id') and int(span['id']) == formula_id:
+                    found = True
+                    break
+            if not found:
+                lst_not_located.append(formula_id)
+    return lst_not_located
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-ncom', type=str, help='new comment file path')
@@ -63,6 +87,8 @@ def main():
         comment = comment_parser.map_just_comments[comment_id]
         text = comment.text
         print(str(latex)+"\t"+str(formula_id)+"\t"+str(text)+"\n\n")
+    lst_missed_ids = check_all_formulas_located(comment_parser, dic_formula_comment_id)
+    print(str(len(lst_missed_ids))+" formulas are not located in math-container tag")
 
 
 if __name__ == '__main__':
