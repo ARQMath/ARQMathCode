@@ -1,6 +1,6 @@
 Here are set of commands to generate the dataset and run a tests.
 
-1. Generating XML file for Comments. To run this code download the older version of Comments.xml file (Comments.V1.2.cml) from [ARQMath Google drive](https://drive.google.com/drive/folders/1YekTVvfmYKZ8I5uiUMbs21G2mKwF9IAm?usp=sharing).
+1. Generating XML file for Comments. To run this code download the older version of Comments.xml file (Comments.V1.2.xml) from [ARQMath Google drive](https://drive.google.com/drive/folders/1YekTVvfmYKZ8I5uiUMbs21G2mKwF9IAm?usp=sharing).
 Also, download the updated LaTex files (with HTML encoding fixed), `latex_representation_v3`, from [here](https://drive.google.com/drive/folders/1o0JnMlyCtNCnW4cq7xwh_btr7qM36mZz?usp=sharing).
 Run the command from the root directory with three inputs: old comments.xml file path, new comments.xml file path and latex directory. 
 Example command:
