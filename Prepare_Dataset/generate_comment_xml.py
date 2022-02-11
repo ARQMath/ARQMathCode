@@ -2,10 +2,10 @@ import xml.etree.cElementTree as ET
 import csv
 import os
 import sys
-import re
-import argparse
 conf_path = os.getcwd()
 sys.path.append(conf_path)
+import re
+import argparse
 from bs4 import BeautifulSoup
 from xml.dom import minidom
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
