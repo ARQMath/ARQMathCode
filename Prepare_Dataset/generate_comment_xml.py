@@ -252,18 +252,18 @@ def match_to_pattern(formula, text):
     return map_index
 
 
-def convert_mse_arqmath_comment_file(old_post_xml, new_post_xml, latex_dir, dic_comment_id_list_formula_ids):
+def convert_mse_arqmath_comment_file(old_comment_xml, new_comment_xml, latex_dir, dic_comment_id_list_formula_ids):
     """
     Takes in the Original comment file from MSE Archive, the extracted formula tsv file and the results file path
     for the new comment file and do the conversion.
-    @param old_post_xml: The older version of comment XML file
-    @param new_post_xml: The new version of comment XML file (to be generated)
+    @param old_comment_xml: The older version of comment XML file
+    @param new_comment_xml: The new version of comment XML file (to be generated)
     @param latex_dir: The directory where TSV latex files are located in
     @param dic_comment_id_list_formula_ids: dictionary of comment id and list of formula ids in the comment
     """
     dic_formula_id_latex, dic_formula_id_post_id = read_all_formula_files(latex_dir)
 
-    comment_parser = CommentParserRecord(old_post_xml)
+    comment_parser = CommentParserRecord(old_comment_xml)
     root = ET.Element("comments")
     list_not_found = []
     for comment_id in comment_parser.map_just_comments:
@@ -288,7 +288,7 @@ def convert_mse_arqmath_comment_file(old_post_xml, new_post_xml, latex_dir, dic_
             sub.set('UserId', str(user_id))
 
     xml_str = minidom.parseString(ET.tostring(root)).toprettyxml(indent="   ")
-    with open(new_post_xml, "w", encoding="utf-8") as f:
+    with open(new_comment_xml, "w", encoding="utf-8") as f:
         f.write(xml_str)
 
     with open("not_found_comment_formulas.txt", "w", encoding="utf-8") as f:
