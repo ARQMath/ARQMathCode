@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "[Generating Comment XML file]"
-#python3 Prepare_Dataset/associate_formula_comment_ids.py -com $1 -ldir $3
-#python3 Prepare_Dataset/generate_comment_xml.py -ocom $1 -ncom $2 -ldir $3
+python3 Prepare_Dataset/associate_formula_comment_ids.py -com $1 -ldir $3
+python3 Prepare_Dataset/generate_comment_xml.py -ocom $1 -ncom $2 -ldir $3
 python3 Prepare_Dataset/test_codes/comment_file_testing.py -ncom $2 -ldir $3
 echo "[Done]"
