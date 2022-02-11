@@ -27,7 +27,7 @@ def read_intermediate_tsv(file_path):
     return dic_comment_id_list_formula_ids
 
 
-def read_all_formula_files(formula_file_path):
+def read_all_formula_files(latex_formula_dir):
     """
         Takes in formula file path and read it line by line and return three dictionaries:
         dic_formula_id_latex:
@@ -37,8 +37,8 @@ def read_all_formula_files(formula_file_path):
     """
     dic_formula_id_latex = {}
     dic_formula_id_post_id = {}
-    for file in os.listdir(formula_file_path):
-        with open(formula_file_path + "/" + file, mode='r', encoding="utf-8") as csv_file:
+    for file in os.listdir(latex_formula_dir):
+        with open(latex_formula_dir + "/" + file, mode='r', encoding="utf-8") as csv_file:
             csv_reader = csv.reader(csv_file, delimiter='\t')
             next(csv_reader)
             for row in csv_reader:
