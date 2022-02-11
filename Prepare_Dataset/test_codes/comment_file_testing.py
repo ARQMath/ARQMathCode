@@ -47,7 +47,7 @@ def check_all_formulas_located(comment_parser, dic_formula_comment_id):
     lst_not_located = []
     for formula_id in dic_formula_comment_id:
         comment_id = dic_formula_comment_id[formula_id]
-        if comment_id not in comment_parser:
+        if comment_id not in comment_parser.map_just_comments:
             lst_not_located.append(formula_id)
             continue
         else:

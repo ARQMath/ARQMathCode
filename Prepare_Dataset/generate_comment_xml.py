@@ -1,3 +1,4 @@
+import html
 import xml.etree.cElementTree as ET
 import csv
 import os

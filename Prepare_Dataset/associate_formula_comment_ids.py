@@ -17,7 +17,6 @@ from Prepare_Dataset.re_generate_post import match_to_pattern, check_existence
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
 
 
-
 def read_formula_file(directory):
     """
     This method reads the formula files and returns a dictionary of post id: dictionary of formula id, latex
@@ -25,7 +24,7 @@ def read_formula_file(directory):
     dic_post_id_formula = {}
     counter = 0
     for file in os.listdir(directory):
-        with open(directory + str(file), 'r', newline='', encoding="utf-8") as csv_file:
+        with open(directory +"/"+ str(file), 'r', newline='', encoding="utf-8") as csv_file:
             csv_reader = csv.reader(csv_file, delimiter='\t')
             next(csv_reader)
             for row in csv_reader:
@@ -56,7 +55,7 @@ def find_already_assigned_formula_ids(cr):
         spans = soup.find_all('span', {'class': 'math-container'})
         for span in spans:
             if span.has_attr('id'):
-                comment_body = comment_body.replace(str(span), span.text, 1)
+                cr.map_just_comments[comment_id].text = comment_body.replace(str(span), span.text, 1)
     return dic_formula_comment_id
 
 
@@ -77,6 +76,7 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
         if post_id not in cr.map_of_comments_for_post:
             not_found_count += len(dic_post_id_formula[post_id])
             continue
+
 
         #sort by length
         dic_formulas_in_comments = dic_post_id_formula[post_id]
@@ -104,6 +104,8 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
         csv_writer = csv.writer(csv_file, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for formula_id in dic_formula_id_comment_id:
             csv_writer.writerow([str(formula_id), str(dic_formula_id_comment_id[formula_id])])
+
+    print(str(not_found_count) + " formulas in TSV are not in comment file")
 
 
 def main():
