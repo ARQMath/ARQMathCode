@@ -15,10 +15,7 @@ The sample commands are shown in ```post_reader_record.py``` to read data such a
 Note that the DataReader is used for reading the test collection. In order to read the questions, please use the ```topic_file_reader.py```. The sample commands on available in this file.
 
 ## Test Files
-1. ```run_id_fix```: this script is used for finding missing formula ids in the Posts.xml file and located formula id in `math-container` HTML tags. Pass the source directory to this command that contains the latest version of XML posts file (Posts.V1.2.xml) and the latest version of LaTex directory (latex_representation_v2).
-Note that the formula LaTex representations can be downloaded from [ARQMath Google Drive](https://drive.google.com/drive/folders/18bHlAWkhIJkLeS9CHvBQQ-BLSn4rrlvE?usp=sharing).
-This code will find the missing formula ids (missed_formula_id.txt), regenerate XML post file (Posts.V1.3.xml), and refind the missing formula ids (new_missed_post_id.txt).
-
+The test code for preparing the dataset are in `Prepare_Dataset` directory with the related README file.
 
 ## Authors
 
