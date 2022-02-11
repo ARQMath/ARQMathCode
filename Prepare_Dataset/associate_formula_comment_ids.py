@@ -11,9 +11,9 @@ import csv
 import argparse
 import sys
 
-from bs4 import BeautifulSoup
 conf_path = os.getcwd()
 sys.path.append(conf_path)
+from bs4 import BeautifulSoup
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
 from Prepare_Dataset.re_generate_post import match_to_pattern, check_existence
 

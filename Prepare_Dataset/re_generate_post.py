@@ -261,7 +261,7 @@ def match_to_pattern(formula, text):
     map_index[text4] = text.find(text4)
     text5 = "$" + formula + "$"
     map_index[text5] = text.find(text5)
-    text6 = formula
+    text6 = " " + formula + " "
     map_index[text6] = text.find(text6)
     return map_index
 
@@ -431,6 +431,6 @@ def regenerate_xml_files(missed_formula_id_path, old_post_xml, new_post_xml, lat
     convert_mse_arqmath_post_file(old_post_xml, latex_dir, new_post_xml, lst_missed_formulas)
 
     "Conversion of comment file"
-    # lst_missed_formulas = read_missed_ids(home + "missed_formula_ids_arqmath2_comment.tsv")
-    # convert_mse_arqmath_comment_file(home + "Comments.V1.2.xml", home + "latex_representation_v3", "Comments.V1.3.xml",
-    #                                  lst_missed_formulas)
+    lst_missed_formulas = read_missed_ids(home + "missed_formula_ids_arqmath2_comment.tsv")
+    convert_mse_arqmath_comment_file(home + "Comments.V1.2.xml", home + "latex_representation_v3", "Comments.V1.3.xml",
+                                     lst_missed_formulas)
