@@ -1,3 +1,4 @@
+import html
 import xml.etree.ElementTree as ET
 from Entities.Comment import Comment
 
@@ -16,7 +17,7 @@ class CommentParserRecord:
             attr_dic = child.attrib
             comment_id = int(attr_dic["Id"])
             post_id = int(attr_dic["PostId"])
-            text = (attr_dic["Text"])
+            text = html.escape((attr_dic["Text"]))
             creation_date = None
             score = None
             user_id = None
