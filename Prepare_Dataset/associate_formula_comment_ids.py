@@ -56,7 +56,7 @@ def find_already_assigned_formula_ids(cr):
         spans = soup.find_all('span', {'class': 'math-container'})
         for span in spans:
             if span.has_attr('id'):
-                dic_formula_comment_id[int(span['id'])] = int(comment_id)
+                comment_body = comment_body.replace(str(span), span.text, 1)
     return dic_formula_comment_id
 
 
@@ -66,8 +66,8 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
     cr = CommentParserRecord(comment_file_path)
 
     # find the formulas that are already assigned to comments (in comment xml file they are in math-container tag with id)
-    dic_formula_id_comment_id = find_already_assigned_formula_ids(cr)
-
+    find_already_assigned_formula_ids(cr)
+    dic_formula_id_comment_id = {}
     # reading formulas ids from tsv; those in comments
     # dictionary --> post id : list tuples (formula id, latex)
     dic_post_id_formula = read_formula_file(directory)
