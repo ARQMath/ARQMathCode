@@ -61,7 +61,8 @@ def check_all_formulas_located(comment_parser, dic_formula_comment_id):
                     found = True
                     break
             if not found:
-                lst_not_located.append(formula_id)
+                if str(formula_id) not in comment.text:
+                    lst_not_located.append(formula_id)
     return lst_not_located
 
 
