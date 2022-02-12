@@ -15,7 +15,7 @@ The sample commands are shown in ```post_reader_record.py``` to read data such a
 Note that the DataReader is used for reading the test collection. In order to read the questions, please use the ```topic_file_reader.py```. The sample commands on available in this file.
 
 ## Test Files
-The test code for preparing the dataset are in `Prepare_Dataset/commands` directory with the related README file.
+The test code for preparing the dataset are in `Prepare_Dataset/commands` directory. Please note that there is README file to run these commands with the description of the codes.
 
 ## Authors
 
