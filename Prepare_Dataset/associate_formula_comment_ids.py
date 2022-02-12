@@ -44,11 +44,10 @@ def read_formula_file(directory):
 
 def find_already_assigned_formula_ids(cr):
     """
-    In the previous XML files released in ARQMath-1 and -2 some formulas were already assigned
-    to comment and were inside a math-container tag. This method finds these formulas and returns
-    dictionary of formula id: comment id
+    Some of the formulas that were previously annotated with math-container in Comment.xml file, were wrongly annotated
+    For example for formula `d`, a letter from the word didn't was in math-container. This method, removed previously
+    annotated formulas
     """
-    dic_formula_comment_id = {}
     for comment_id in cr.map_just_comments:
         comment_body = cr.map_just_comments[comment_id].text
         soup = BeautifulSoup(comment_body)
@@ -56,7 +55,7 @@ def find_already_assigned_formula_ids(cr):
         for span in spans:
             if span.has_attr('id'):
                 cr.map_just_comments[comment_id].text = comment_body.replace(str(span), span.text, 1)
-    return dic_formula_comment_id
+    return
 
 
 def associate_formula_id_with_comment_id(comment_file_path, directory, accociation_file):
@@ -83,20 +82,27 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
         sorted_keys = sorted(dic_formulas_in_comments, key=lambda k: len(dic_formulas_in_comments[k]), reverse=True)
 
         # list comments
-        lst_comments = cr.map_of_comments_for_post[post_id]
         for formula_id in sorted_keys:
             # formula already assigned
             if formula_id in dic_formula_id_comment_id:
                 continue
-
             latex = dic_formulas_in_comments[formula_id]
             find = False
-            for comment in lst_comments:
-                if check_existence(match_to_pattern(latex, comment.text)):
-                    dic_formula_id_comment_id[formula_id] = comment.id
-                    comment.text = comment.text.replace(latex, "XFXFX", 1)
-                    find = True
-                    break
+            for comment in cr.map_of_comments_for_post[post_id]:
+                map_index = match_to_pattern(latex, comment.text)
+                exists = check_existence(map_index)
+
+                if exists:
+                    sorted_x = sorted(map_index.items(), key=lambda kv: kv[1])
+                    for item in sorted_x:
+                        if item[1] != -1:
+                            detected_formula = item[0]
+                            dic_formula_id_comment_id[formula_id] = comment.id
+                            comment.text = comment.text.replace(detected_formula, "XFXFX_"+str(formula_id), 1)
+                            find = True
+                            break
+                    if find:
+                        break
             if not find:
                 not_found_count += 1
 
