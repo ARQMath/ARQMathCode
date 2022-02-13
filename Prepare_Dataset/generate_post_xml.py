@@ -7,7 +7,9 @@ import argparse
 
 from bs4 import BeautifulSoup
 from xml.dom import minidom
-
+import sys
+conf_path = os.getcwd()
+sys.path.append(conf_path)
 from Entity_Parser_Record.post_parser_record import PostParserRecord
 
 
