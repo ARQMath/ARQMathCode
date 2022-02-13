@@ -3,9 +3,8 @@ import xml.etree.cElementTree as ET
 import csv
 import os
 import codecs
-import re
-
 import argparse
+
 from bs4 import BeautifulSoup
 from xml.dom import minidom
 
