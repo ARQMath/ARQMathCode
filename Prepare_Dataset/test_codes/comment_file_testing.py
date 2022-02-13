@@ -68,12 +68,12 @@ def check_all_formulas_located(comment_parser, dic_formula_comment_id):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-ncom', type=str, help='new comment file path')
+    parser.add_argument('-nc', type=str, help='new comment file path')
     parser.add_argument('-ldir', type=str, help='laTex TSV files directory')
     args = vars(parser.parse_args())
 
     formula_comment_id = "./formula_comment_id.tsv"
-    new_xml = args['ncom']
+    new_xml = args['nc']
     latex_dir = args['ldir']
     dic_formula_comment_id = read_comment_intermediate_file(formula_comment_id)
     comment_parser = CommentParserRecord(new_xml)

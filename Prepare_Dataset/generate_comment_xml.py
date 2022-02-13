@@ -306,13 +306,13 @@ def regenerate_comment_xml_file(old_comment_xml, new_comment_xml, latex_dir, ass
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-ocom', type=str, help='old comment file path')
-    parser.add_argument('-ncom', type=str, help='new comment file path')
+    parser.add_argument('-oc', type=str, help='old comment file path')
+    parser.add_argument('-nc', type=str, help='new comment file path')
     parser.add_argument('-ldir', type=str, help='laTex TSV files directory')
     args = vars(parser.parse_args())
 
-    old_comment_file = args['ocom']
-    new_comment_file = args['ncom']
+    old_comment_file = args['oc']
+    new_comment_file = args['nc']
     latex_dir = args['ldir']
     association_file = "formula_comment_id.tsv"
     regenerate_comment_xml_file(old_comment_file, new_comment_file, latex_dir, association_file)

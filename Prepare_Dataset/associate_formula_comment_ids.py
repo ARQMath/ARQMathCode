@@ -117,11 +117,11 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('-com', type=str, help='comment file path')
+    parser.add_argument('-oc', type=str, help='comment file path')
     parser.add_argument('-ldir', type=str, help='laTex TSV files directory')
     args = vars(parser.parse_args())
 
-    comment_file = args['com']
+    comment_file = args['oc']
     latex_dir = args['ldir']
     association_file = "formula_comment_id.tsv"
     associate_formula_id_with_comment_id(comment_file, latex_dir, association_file)

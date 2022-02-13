@@ -1,6 +1,33 @@
 #!/bin/bash
+
+usage() {
+	echo "This script generates Comment.xml file with formulas correctly annotated in math-container HTML tag and run a test code"
+	echo "usage: $0 [-oc] [-nc] [-ldir]"
+  echo "  -oc  old comment file path"
+  echo "  -nc  new comment file path"
+  echo "  -ldir latex TSV files directory"
+	}
+
+# check whether user had supplied -h or --help . If yes display usage
+if [[ $# == "--help" || $# == "-h" ]];
+then
+  usage
+  exit 1
+fi
+
+# if less than three arguments supplied, display usage
+if [  $# -le 2 ]
+then
+  usage
+  exit 1
+fi
+
+oc=$1
+nc=$2
+ldir=$3
+
 echo "[Generating Comment XML file]"
-python3 Prepare_Dataset/associate_formula_comment_ids.py -com $1 -ldir $3
-python3 Prepare_Dataset/generate_comment_xml.py -ocom $1 -ncom $2 -ldir $3
-python3 Prepare_Dataset/test_codes/comment_file_testing.py -ncom $2 -ldir $3
+python3 Prepare_Dataset/associate_formula_comment_ids.py -oc "$oc" -ldir "$ldir"
+python3 Prepare_Dataset/generate_comment_xml.py -oc "$oc" -nc "$nc" -ldir "$ldir"
+python3 Prepare_Dataset/test_codes/comment_file_testing.py -nc "$nc" -ldir "$ldir"
 echo "[Done]"
