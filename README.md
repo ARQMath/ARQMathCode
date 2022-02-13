@@ -80,8 +80,7 @@ located inside the `math-container` tag.
 
 Finally, 10 formulas are randomly selected from those inside posts (answers and questions), and prints their id, latex and post body for visual (manual) testing.
 It also, check all the formulas from the posts to print how many formulas are not correctly located in xml file.
-The test code for preparing the dataset are in `Prepare_Dataset/commands` directory. Please note that there is README file to run these commands with the description of the codes.
-
+The test code for preparing the dataset are in `Prepare_Dataset/commands` directory. 
 ## Authors
 
 This code is provided by [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/) co-organizers Behrooz Mansouri.
