@@ -1,5 +1,32 @@
 #!/bin/bash
+
+usage() {
+	echo "This script generates Post.xml file with formulas correctly annotated in math-container HTML tag and run a test code"
+	echo "usage: $0 [-op] [-np] [-ldir]"
+  echo "  -op  old post file path"
+  echo "  -np  new post file path"
+  echo "  -ldir latex TSV files directory"
+	}
+
+# check whether user had supplied -h or --help . If yes display usage
+if [[ $# == "--help" || $# == "-h" ]];
+then
+  usage
+  exit 1
+fi
+
+# if less than three arguments supplied, display usage
+if [  $# -le 2 ]
+then
+  usage
+  exit 1
+fi
+
+op=$1
+np=$2
+ldir=$3
+
 echo "[Generating Post XML file]"
-python3 Prepare_Dataset/generate_post_xml.py -op $1 -np $2 -ldir $3
-python3 Prepare_Dataset/test_codes/post_file_testing.py -np $2 -ldir $3
+python3 Prepare_Dataset/generate_post_xml.py -op "$op" -np "$np" -ldir "$ldir"
+python3 Prepare_Dataset/test_codes/post_file_testing.py -np "$np" -ldir "$ldir"
 echo "[Done]"
