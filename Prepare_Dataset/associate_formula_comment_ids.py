@@ -5,7 +5,7 @@ In the released versions of ARQMath-1 and -2, the column post id showed what pos
 not exactly which comment. This code creates a TSV file first column showing the formula id and the second column
 showing the comment id.
 """
-
+import html
 import os
 import csv
 import argparse
@@ -89,6 +89,7 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
             latex = dic_formulas_in_comments[formula_id]
             find = False
             for comment in cr.map_of_comments_for_post[post_id]:
+                comment.text = html.unescape(comment.text)
                 map_index = match_to_pattern(latex, comment.text)
                 exists = check_existence(map_index)
 

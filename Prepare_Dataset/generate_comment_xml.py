@@ -271,6 +271,7 @@ def convert_mse_arqmath_comment_file(old_comment_xml, new_comment_xml, latex_dir
         comment = comment_parser.map_just_comments[comment_id]
         creation_date = comment.creation_date
         score = comment.score
+        comment.text = html.unescape(comment.text)
         text = comment.text
         post_id = comment.related_post_id
         user_id = comment.user_id
