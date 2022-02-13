@@ -1,4 +1,3 @@
-import html
 import xml.etree.ElementTree as ET
 from Entities.Comment import Comment
 
