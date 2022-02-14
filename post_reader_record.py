@@ -28,13 +28,13 @@ class DataReaderRecord:
         and then each of the files are read and the related data are linked together.
         :param root_file_path: The root directory of MSE ARQMath Dataset.
         """
-        post_file_path = root_file_path + "/Posts.xml"
-        badges_file_path = root_file_path + "/Badges.xml"
-        comments_file_path = root_file_path + "/Comments.xml"
-        votes_file_path = root_file_path + "/Votes.xml"
-        users_file_path = root_file_path + "/Users.xml"
-        post_links_file_path = root_file_path + "/PostLinks.xml"
-        post_history_file_path = root_file_path + "/PostHistory.xml"
+        post_file_path = root_file_path + "/Posts.V1.3.xml"
+        badges_file_path = root_file_path + "/Badges.V1.3.xml"
+        comments_file_path = root_file_path + "/Comments.V1.3.xml"
+        votes_file_path = root_file_path + "/Votes.V1.3.xml"
+        users_file_path = root_file_path + "/Users.V1.3.xml"
+        post_links_file_path = root_file_path + "/PostLinks.V1.3.xml"
+        #post_history_file_path = root_file_path + "/PostHistory.xml"
 
         print("reading users")
         self.user_parser = UserParserRecord(users_file_path, badges_file_path)
@@ -119,6 +119,53 @@ class DataReaderRecord:
         :param result_directory: directory to save html files
         """
         HtmlGenerator.questions_to_html(lst_of_questions_id, self, result_directory)
+
+    def get_all_html_pages(self, result_directory):
+        """
+        :param lst_of_questions_id: list of question to create their html views
+        :param result_directory: directory to save html files
+        """
+        dic_year = {}
+        dic_year_month = {}
+        dic_directories = self.create_all_htmls_directories(dic_year, dic_year_month, result_directory)
+        for question_id in self.post_parser.map_questions:
+            question = self.post_parser.map_questions[question_id]
+            date_part = question.creation_date.split("T")[0].split("-")
+            year = date_part[0]
+            month = date_part[1]
+            dir = dic_directories[year+"-"+month]
+            HtmlGenerator.questions_to_html([question_id], self, dir)
+
+    def create_all_htmls_directories(self, dic_year, dic_year_month, result_directory):
+        dic_directories = {}
+        for question_id in self.post_parser.map_questions:
+            question = self.post_parser.map_questions[question_id]
+            date_part = question.creation_date.split("T")[0].split("-")
+            year = date_part[0]
+            month = date_part[1]
+            if year in dic_year:
+                dic_year[year].append(int(question_id))
+                if month in dic_year_month[year]:
+                    dic_year_month[year][month].append(int(question_id))
+                else:
+                    dic_year_month[year][month] = [int(question_id)]
+            else:
+                dic_year[year] = [int(question_id)]
+                dic_year_month[year] = {month: [int(question_id)]}
+        if not os.path.exists(result_directory):
+            os.makedirs(result_directory)
+        copyfile("./Visualization/mse.svg", result_directory+"/mse.svg")
+        copyfile("./Visualization/arqmath.png", result_directory + "/arqmath.png")
+        for year in dic_year:
+            temp = result_directory + "/" + str(min(dic_year[year])) + "_" + str(year)
+            if not os.path.exists(temp):
+                os.makedirs(temp)
+            for month in dic_year_month[year]:
+                temp2 = temp + "/" + str(min(dic_year_month[year][month])) + "_" + str(month)
+                if not os.path.exists(temp2):
+                    os.makedirs(temp2)
+                dic_directories[year+"-"+month] = temp2
+        return dic_directories
 
 
 def main():
