@@ -12,8 +12,9 @@ import argparse
 import sys
 conf_path = os.getcwd()
 sys.path.append(conf_path)
+
+from Prepare_Dataset.generate_comment_xml import match_to_pattern, check_existence
 from bs4 import BeautifulSoup
-from Prepare_Dataset.re_generate_post import match_to_pattern, check_existence
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
 
 
@@ -24,7 +25,7 @@ def read_formula_file(directory):
     dic_post_id_formula = {}
     counter = 0
     for file in os.listdir(directory):
-        with open(directory +"/"+ str(file), 'r', newline='', encoding="utf-8") as csv_file:
+        with open(directory + "/" + str(file), 'r', newline='', encoding="utf-8") as csv_file:
             csv_reader = csv.reader(csv_file, delimiter='\t')
             next(csv_reader)
             for row in csv_reader:
@@ -76,8 +77,7 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
             not_found_count += len(dic_post_id_formula[post_id])
             continue
 
-
-        #sort by length
+        # sort by length
         dic_formulas_in_comments = dic_post_id_formula[post_id]
         sorted_keys = sorted(dic_formulas_in_comments, key=lambda k: len(dic_formulas_in_comments[k]), reverse=True)
 
@@ -99,7 +99,7 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
                         if item[1] != -1:
                             detected_formula = item[0]
                             dic_formula_id_comment_id[formula_id] = comment.id
-                            comment.text = comment.text.replace(detected_formula, "XFXFX_"+str(formula_id), 1)
+                            comment.text = comment.text.replace(detected_formula, "XFXFX_" + str(formula_id), 1)
                             find = True
                             break
                     if find:
