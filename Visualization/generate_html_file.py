@@ -1,23 +1,25 @@
+import html
+from bs4 import BeautifulSoup
 template_file = "Visualization/template.html"
 
 
-class HtmlGenerator:
-    @staticmethod
-    def normalize_html_xml(text):
-        count = text.count("&quot;")
-        text = text.replace("&quot;", "\"", count)
-        count = text.count("&apos;")
-        text = text.replace("&apos;", "'", count)
-        count = text.count("&lt;")
-        text = text.replace("&lt;", "<", count)
-        count = text.count("&gt;")
-        text = text.replace("&gt;", ">", count)
-        count = text.count("&amp;")
-        text = text.replace("&amp;", "&", count)
-        count = text.count("&#A;")
-        text = text.replace("&#A;", "\n", count)
-        return text
+def format_formulas(temp_text):
+    soup = BeautifulSoup(temp_text)
+    spans = soup.find_all('span', {'class': 'math-container'})
+    for span in spans:
+        formula = span.text
+        if not formula.startswith("$"):
+            formula = "$" + formula + "$"
+            if span.has_attr('id'):
+                formula_id = str(span['id'])
+                replace = "<span class=\"math-container\" id=\"" + str(formula_id) + "\">" + formula + "</span>"
+            else:
+                replace = "<span class=\"math-container\">" + formula + "</span>"
+            temp_text = temp_text.replace(str(span), replace, 1)
+    return temp_text
 
+
+class HtmlGenerator:
     @staticmethod
     def read_html(html_template):
         file = open(html_template)
@@ -45,6 +47,7 @@ class HtmlGenerator:
         temp = HtmlGenerator.replace_item("#ASKERINFO#", user_html, temp)
         temp = HtmlGenerator.replace_item("#QCOMMENTS#", comment_html, temp)
         temp = HtmlGenerator.replace_item("#ANSWERS#", answer_html, temp)
+        temp = format_formulas(temp)
         return temp
 
     @staticmethod
@@ -172,10 +175,10 @@ class HtmlGenerator:
         return temp
 
     @staticmethod
-    def save_html(result_file, html):
+    def save_html(result_file, html_content):
         file = open(result_file, "w")
-        html = HtmlGenerator.normalize_html_xml(html)
-        file.write(html)
+        html_content = html.unescape(html_content)
+        file.write(html_content)
         file.close()
 
     @staticmethod
@@ -247,7 +250,7 @@ class HtmlGenerator:
                 answer_html = HtmlGenerator.process_answers(data_reader, question.answers, question.accepted_answer_id)
                 html = HtmlGenerator.generate_post(html, title, post_id, post_score, post_body, post_answer_count,
                                                    tag_lst, rel_dic, user_html, comment_html, answer_html)
-                HtmlGenerator.save_html(html_directory+str(question_id)+".html", html)
+                HtmlGenerator.save_html(html_directory+"/"+str(question_id)+".html", html)
             except Exception as er:
                 print("issue generating html file for query:" + str(question_id))
                 print(str(er))
