@@ -89,7 +89,28 @@ located inside the `math-container` tag.
 
 Finally, 10 formulas are randomly selected from those inside posts (answers and questions), and prints their id, latex and post body for visual (manual) testing.
 It also, check all the formulas from the posts to print how many formulas are not correctly located in xml file.
-The test code for preparing the dataset are in `Prepare_Dataset/commands` directory. 
+
+### 3. Generating HTML Thread Files
+This command generates the supplementary HTML thread files, that can be used for viewing question in a format similar to MathStackExchange.
+**Note** that these files are not used for the tasks and are just as a mean of visualization for analysis purposes.
+
+**Result File Structure.** As the test collection has questions from 2010 to 2018, the threads are created in separate directories, based on 
+the question post year, each directory containing the questions from that year. For each year, questions from different 
+months are separated in their associated directory. Finally, each directory, start with the lowest question id in that month
+and year. For example, the directory `16020_2011` has the questions posted in `2011` and questions in this year, start with 
+id 16020. Inside this directory, there are 12 subdirectories for each month. For example, directory `24324_03` contains
+questions posted in March and question ids in this month starts from `24324`.
+
+**Data.** Download all the XML files in ARQMath test collection and locate them in a single directory.
+(at the moment, use this [link](https://drive.google.com/drive/folders/1Ge8P7iAkEZQWseHuRR1Yhzn_aS7H9U4s?usp=sharing) which
+is the draft for the latest version of dataset, having correct math-container tags and formula ids).
+
+**Run Command.** Run the command from the root directory with two inputs: ARQMath directory path, Destination Directory path.
+ARQMath directory contains all the XML files and Destination directory is where the threads are generated.
+Example command:
+```
+Prepare_Dataset/commands/generate_html_threads "./ARQMath_Data" "./CollectionByYear"
+```
 ## Authors
 
 This code is provided by [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/) co-organizers Behrooz Mansouri.
