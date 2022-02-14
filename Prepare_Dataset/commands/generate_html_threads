@@ -1,0 +1,29 @@
+#!/bin/bash
+
+usage() {
+	echo "This script generates html thread files for each question in ARQMath test collection"
+	echo "usage: $0 [-ad] [-td]"
+  echo "  -ad  ARQMath directory where XML files are located"
+  echo "  -td  new post file path"
+	}
+
+# check whether user had supplied -h or --help . If yes display usage
+if [[ $# == "--help" || $# == "-h" ]];
+then
+  usage
+  exit 1
+fi
+
+# if less than three arguments supplied, display usage
+if [  $# -le 1 ]
+then
+  usage
+  exit 1
+fi
+
+ad=$1
+td=$2
+
+echo "[Generating HTML thread files]"
+python3 Prepare_Dataset/generate_html_threads.py -ad "$ad" -td "$td"
+echo "[Done]"
