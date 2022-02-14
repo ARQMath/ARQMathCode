@@ -2,6 +2,15 @@
 This Repo provides the codes used to create [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/) collection and topics. It also provides
 the code to read the ARQMath data. 
 
+## Requirements
+To install the requirements run the following code from the root directory:
+```
+./bin/install
+```
+
+To extract the Presentation/Content MathML representations, we use [LaTeXML](https://math.nist.gov/~BMiller/LaTeXML/) tool
+version 0.8.5.
+
 ## Reading ARQMath Data
 
 To begin the code, first download and locate the ARQMath Dataset from [here](https://drive.google.com/drive/folders/1YekTVvfmYKZ8I5uiUMbs21G2mKwF9IAm?usp=sharing).

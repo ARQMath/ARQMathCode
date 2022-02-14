@@ -1,0 +1,24 @@
+#!/bin/bash
+bash Prepare_Dataset/conversions/install
+ LaTeXML
+echo ""
+echo "[ Downloading LaTeXML ]"
+if [ -d ./LaTeXML ]
+then
+	mymsg "LaTeXML repository already downloaded."
+  cd LaTeXML-0.8.5
+  perl Makefile.PL
+  make
+  make test
+  make install
+  cd ..
+else
+  wget https://math.nist.gov/~BMiller/LaTeXML/releases/LaTeXML-0.8.5.tar.gz
+  tar zxvf LaTeXML-0.8.5.tar.gz
+  cd LaTeXML-0.8.5
+  perl Makefile.PL
+  make
+  make test
+  make install
+  cd ..
+fi
