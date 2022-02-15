@@ -24,6 +24,7 @@ fi
 ad=$1
 td=$2
 
+
 echo "[Generating HTML thread files]"
 python3 Prepare_Dataset/generate_html_threads.py -ad "$ad" -td "$td"
 echo "[Done]"

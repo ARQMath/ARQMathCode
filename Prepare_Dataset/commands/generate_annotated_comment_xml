@@ -26,6 +26,7 @@ oc=$1
 nc=$2
 ldir=$3
 
+
 echo "[Generating Comment XML file]"
 python3 Prepare_Dataset/associate_formula_comment_ids.py -oc "$oc" -ldir "$ldir"
 python3 Prepare_Dataset/generate_comment_xml.py -oc "$oc" -nc "$nc" -ldir "$ldir"
