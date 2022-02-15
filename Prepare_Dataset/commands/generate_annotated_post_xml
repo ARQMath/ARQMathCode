@@ -28,7 +28,7 @@ ldir=$3
 
 
 echo "[Generating Post XML file]"
-echo "[Generating Post XML file]"
+echo "[Due to the size of the files this can take time, ~1 hour]"
 python3 Prepare_Dataset/generate_post_xml.py -op "$op" -np "$np" -ldir "$ldir"
 python3 Prepare_Dataset/test_codes/post_file_testing.py -np "$np" -ldir "$ldir"
 echo "[Done]"

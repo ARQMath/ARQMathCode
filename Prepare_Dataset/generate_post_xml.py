@@ -198,6 +198,7 @@ def write_missed_formula_id(lst_formulas_missed_post_not_available, lst_formulas
 
 def fix_post_files(old_post_xml, latex_dir):
     # Conversion of post file
+    print("Reading XML and TSV files")
     pr, dic_question_title, dic_question_body, dic_answer, dic_formula_id_latex = read_arqmath_data_post(old_post_xml,
                                                                                                          latex_dir)
     lst_formulas_missed_post_not_available = []
@@ -205,6 +206,7 @@ def fix_post_files(old_post_xml, latex_dir):
     lst_fixed_formulas = []
     ###############################################################################################################
     # # Fixing Question Title
+    print("Fixing Questions Title")
     for post_id in dic_question_title:
         lst_formulas_in_title = dic_question_title[post_id]
         if post_id not in pr.map_questions:
@@ -220,6 +222,7 @@ def fix_post_files(old_post_xml, latex_dir):
             lst_fixed_formulas.extend(lst_fixed)
     # ###############################################################################################################
     # # Fixing Question Body
+    print("Fixing Questions Body")
     for post_id in dic_question_body:
         lst_formulas_in_body = dic_question_body[post_id]
         if post_id not in pr.map_questions:
@@ -235,6 +238,7 @@ def fix_post_files(old_post_xml, latex_dir):
             lst_fixed_formulas.extend(lst_fixed)
     ################################################################################################################
     # # Fixing Answer
+    print("Fixing Answers Body")
     for post_id in dic_answer:
         lst_formulas_in_answer = dic_answer[post_id]
         if post_id not in pr.map_just_answers:
@@ -250,10 +254,12 @@ def fix_post_files(old_post_xml, latex_dir):
             lst_fixed_formulas.extend(lst_fixed)
 
     write_missed_formula_id(lst_formulas_missed_post_not_available, lst_formulas_not_in_post)
-    print(str(len(lst_fixed_formulas)) + " formulas are now located in post XML file (fixed)")
-    print(str(len(lst_formulas_not_in_post)) + " formulas not found in XML file")
-    print(str(len(lst_formulas_missed_post_not_available)) + "formulas from TSV files were in posts that are not "
-                                                             "available")
+
+    print("-------------------------------------------------------")
+    print("After applying fixes: \n")
+    print(str(len(lst_fixed_formulas)) + " formulas are fix and located in post XML file")
+    print(str(len(lst_formulas_not_in_post)) + " formulas were not found in XML file")
+    print(str(len(lst_formulas_missed_post_not_available)) + " formulas were in unavailable post files")
     return pr
 
 
