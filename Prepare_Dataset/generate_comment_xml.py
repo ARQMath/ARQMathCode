@@ -301,7 +301,7 @@ def convert_mse_arqmath_comment_file(old_comment_xml, new_comment_xml, latex_dir
 def regenerate_comment_xml_file(old_comment_xml, new_comment_xml, latex_dir, association_file):
     dic_comment_id_list_formula_ids = read_intermediate_tsv(association_file)
     convert_mse_arqmath_comment_file(old_comment_xml, new_comment_xml, latex_dir, dic_comment_id_list_formula_ids)
-    print("conversion done")
+    print("generation of new XML file is done")
 
 
 def main():

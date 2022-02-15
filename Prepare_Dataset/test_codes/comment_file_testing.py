@@ -94,7 +94,8 @@ def main():
     dic_formula_comment_id = read_comment_intermediate_file(formula_comment_id)
     comment_parser = CommentParserRecord(new_xml)
     lst_missed_ids = check_all_formulas_located(comment_parser, dic_formula_comment_id)
-    print("")
+    print("Checking if all the comment formulas are correctly located in XML file with math-container and id")
+    print("Note: Only checking the valid formulas that are both in TSV and XML files")
     print(str(len(lst_missed_ids)) + " formulas are not located in math-container tag")
 
     # this method can be used for visualization of random formulas from comments
