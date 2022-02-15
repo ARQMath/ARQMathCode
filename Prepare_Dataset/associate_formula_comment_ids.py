@@ -18,6 +18,7 @@ from Entity_Parser_Record.comment_parser_record import CommentParserRecord
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
 
+
 def read_formula_file(directory):
     """
     This method reads the formula files and returns a dictionary of post id: dictionary of formula id, latex
