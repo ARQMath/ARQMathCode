@@ -108,7 +108,7 @@ is the draft for the latest version of dataset, having correct math-container ta
 **Run Command.** Run the command from the root directory with two inputs: ARQMath directory path, Destination Directory path.
 ARQMath directory contains all the XML files and Destination directory is where the threads are generated.
 Example command:
-```****
+```
 Prepare_Dataset/commands/generate_html_threads ./ARQMath_Data ./CollectionByYear
 ```
 ## Authors
