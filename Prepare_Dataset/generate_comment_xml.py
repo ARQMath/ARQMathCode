@@ -193,7 +193,7 @@ def set_formulas(text, dic_formula_id_latex, list_formula_ids):
 
     temp_dic = {}
     text = text.replace("\r", "\n", text.count("\r"))
-    soup_text = BeautifulSoup(text)
+    soup_text = BeautifulSoup(text, 'lxml')
     spans = soup_text.find_all('span', {'class': 'math-container'})
     text = handle_already_exists(spans, text)
     lst_not_found = []

@@ -51,7 +51,7 @@ def find_already_assigned_formula_ids(cr):
     """
     for comment_id in cr.map_just_comments:
         comment_body = cr.map_just_comments[comment_id].text
-        soup = BeautifulSoup(comment_body)
+        soup = BeautifulSoup(comment_body, 'lxml')
         spans = soup.find_all('span', {'class': 'math-container'})
         for span in spans:
             if span.has_attr('id'):

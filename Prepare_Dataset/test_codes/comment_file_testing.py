@@ -52,7 +52,7 @@ def check_all_formulas_located(comment_parser, dic_formula_comment_id):
         else:
             comment = comment_parser.map_just_comments[comment_id]
             text = comment.text
-            soup = BeautifulSoup(text)
+            soup = BeautifulSoup(text, 'lxml')
             spans = soup.find_all('span', {'class': 'math-container'})
             found = False
             for span in spans:
