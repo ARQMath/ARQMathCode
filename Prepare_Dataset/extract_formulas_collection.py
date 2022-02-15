@@ -110,7 +110,7 @@ def extract_formulas_from_MSE_dataset(clef_home_directory_file_path):
         question = dr.post_parser.map_questions[question_id]
 
         "we decided to leave the 2019 corpus out"
-        if question.creation_date.split("T")[0].split("-")[0] == "2019":
+        if int(question.creation_date.split("T")[0].split("-")[0]) > 2018:
             continue
 
         "formulas can be both in title and body so we check both of them"
@@ -136,7 +136,7 @@ def extract_formulas_from_MSE_dataset(clef_home_directory_file_path):
             for comment in comment_list:
                 formulas_in_comment = get_list_of_formulas(comment.text)
                 for formula in formulas_in_comment:
-                    csv_writer.writerow([str(formula_id), str(comment.id), str(question_id), "comment", formula])
+                    csv_writer.writerow([str(formula_id), str(question_id), str(question_id), "comment", formula])
                     formula_id += 1
 
         "extracting the formulas from the answers given to the question and writing them on the file"
@@ -155,7 +155,7 @@ def extract_formulas_from_MSE_dataset(clef_home_directory_file_path):
                         formulas_in_comment = get_list_of_formulas(comment.text)
                         for formula in formulas_in_comment:
                             csv_writer.writerow(
-                                [str(formula_id), str(comment.id), str(question_id), "comment", formula])
+                                [str(formula_id), str(answer.post_id), str(question_id), "comment", formula])
                             formula_id += 1
 
 
