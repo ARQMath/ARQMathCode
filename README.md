@@ -38,11 +38,11 @@ There are 3 steps in this command:
 - Testing the generated XML file by printing 10 examples and then looking for all the formulas in the XML file
 
 To run this code download the older version of Comments.xml file (Comments.V1.2.xml) from [ARQMath Google drive](https://drive.google.com/drive/folders/1YekTVvfmYKZ8I5uiUMbs21G2mKwF9IAm?usp=sharing).
-Also, download the updated LaTex files (with HTML encoding fixed), `latex_representation_v3`, from [here](https://drive.google.com/drive/folders/1o0JnMlyCtNCnW4cq7xwh_btr7qM36mZz?usp=sharing).
+Also, download the updated LaTex files (with HTML encoding fixed), `latex_representation_v3`, from [here](https://drive.google.com/drive/folders/1o0JnMlyCtNCnW4cq7xwh_btr7qM36mZz?usp=sharing) and unzip it.
 Run the command from the *root directory* with three inputs: old comments.xml file path, new comments.xml file path and latex directory. 
 Example command:
 ```
-Prepare_Dataset/commands/generate_annotated_comment_xml "./Comments.V1.2.xml" "./Comments.V1.3.xml" "./latex_representation_v3/" 
+Prepare_Dataset/commands/generate_annotated_comment_xml ./Comments.V1.2.xml ./Comments.V1.3.xml ./latex_representation_v3/ 
 ```
 
 This code reads the older version of comment file and LaTex formulas, detected the formulas that are in the comment file. It first creates a TSV file `formula_comment_id.tsv` that
@@ -76,7 +76,7 @@ Also, download the updated LaTex files (with HTML encoding fixed), `latex_repres
 Run the command from the *root directory* with three inputs: old posts.xml file path, new posts.xml file path and latex directory. 
 Example command:
 ```
-Prepare_Dataset/commands/generate_annotated_post_xml "./Posts.V1.2.xml" "./Posts.V1.3.xml" "./latex_representation_v3/" 
+Prepare_Dataset/commands/generate_annotated_post_xml ./Posts.V1.2.xml ./Posts.V1.3.xml ./latex_representation_v3/ 
 ```
 
 This code reads the older version of post file and LaTex formulas, detected the formulas that are in the post file. 
@@ -108,8 +108,8 @@ is the draft for the latest version of dataset, having correct math-container ta
 **Run Command.** Run the command from the root directory with two inputs: ARQMath directory path, Destination Directory path.
 ARQMath directory contains all the XML files and Destination directory is where the threads are generated.
 Example command:
-```
-Prepare_Dataset/commands/generate_html_threads "./ARQMath_Data" "./CollectionByYear"
+```****
+Prepare_Dataset/commands/generate_html_threads ./ARQMath_Data ./CollectionByYear
 ```
 ## Authors
 

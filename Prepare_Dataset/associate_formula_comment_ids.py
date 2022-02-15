@@ -64,17 +64,18 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
     # reading xml comment file
     cr = CommentParserRecord(comment_file_path)
 
-    # find the formulas that are already assigned to comments (in comment xml file they are in math-container tag with id)
+    # find the formulas that are already assigned to comments (in comment xml file they are in math-container tag
+    # with id)
     find_already_assigned_formula_ids(cr)
     dic_formula_id_comment_id = {}
     # reading formulas ids from tsv; those in comments
     # dictionary --> post id : list tuples (formula id, latex)
     dic_post_id_formula = read_formula_file(directory)
 
-    not_found_count = 0
+    lst_not_found_formula = []
     for post_id in dic_post_id_formula:
         if post_id not in cr.map_of_comments_for_post:
-            not_found_count += len(dic_post_id_formula[post_id])
+            lst_not_found_formula.extend(list(dic_post_id_formula[post_id].keys()))
             continue
 
         # sort by length
@@ -105,14 +106,18 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
                     if find:
                         break
             if not find:
-                not_found_count += 1
+                lst_not_found_formula.append(formula_id)
 
     with open(accociation_file, mode='w') as csv_file:
         csv_writer = csv.writer(csv_file, delimiter='\t', quotechar='"', quoting=csv.QUOTE_MINIMAL)
         for formula_id in dic_formula_id_comment_id:
             csv_writer.writerow([str(formula_id), str(dic_formula_id_comment_id[formula_id])])
 
-    print(str(not_found_count) + " formulas in TSV are not in comment file")
+    with open("missed_formulas_comment_before_correction.txt", "w", encoding="utf-8") as file:
+        for formula_id in lst_not_found_formula:
+            file.write(str(formula_id) + "\n")
+
+    print(str(len(lst_not_found_formula)) + " formulas in TSV are not in comment file")
 
 
 def main():

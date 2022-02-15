@@ -3,11 +3,10 @@ import os
 import random
 import argparse
 import sys
-
-from bs4 import BeautifulSoup
-
 conf_path = os.getcwd()
 sys.path.append(conf_path)
+
+from bs4 import BeautifulSoup
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
 
 
@@ -66,6 +65,23 @@ def check_all_formulas_located(comment_parser, dic_formula_comment_id):
     return lst_not_located
 
 
+def visualization_sample(comment_parser, dic_formula_comment_id, latex_dir):
+    """
+    Randomly showing 10 sample formula from comments
+    """
+    dic_formula_id_latex = read_all_formula_files(latex_dir)
+    list_formula_ids = list(dic_formula_comment_id.keys())
+    random.shuffle(list_formula_ids)
+    list_formula_ids = list_formula_ids[:10]
+    print("formula\tformula id\tcomment")
+    for formula_id in list_formula_ids:
+        latex = dic_formula_id_latex[formula_id]
+        comment_id = dic_formula_comment_id[formula_id]
+        comment = comment_parser.map_just_comments[comment_id]
+        text = comment.text
+        print(str(latex) + "\t" + str(formula_id) + "\t" + str(text) + "\n\n")
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-nc', type=str, help='new comment file path')
@@ -77,19 +93,12 @@ def main():
     latex_dir = args['ldir']
     dic_formula_comment_id = read_comment_intermediate_file(formula_comment_id)
     comment_parser = CommentParserRecord(new_xml)
-    dic_formula_id_latex = read_all_formula_files(latex_dir)
-    list_formula_ids = list(dic_formula_comment_id.keys())
-    random.shuffle(list_formula_ids)
-    list_formula_ids = list_formula_ids[:10]
-    print("formula\tformula id\tcomment")
-    for formula_id in list_formula_ids:
-        latex = dic_formula_id_latex[formula_id]
-        comment_id = dic_formula_comment_id[formula_id]
-        comment = comment_parser.map_just_comments[comment_id]
-        text = comment.text
-        print(str(latex)+"\t"+str(formula_id)+"\t"+str(text)+"\n\n")
     lst_missed_ids = check_all_formulas_located(comment_parser, dic_formula_comment_id)
-    print(str(len(lst_missed_ids))+" formulas are not located in math-container tag")
+    print("")
+    print(str(len(lst_missed_ids)) + " formulas are not located in math-container tag")
+
+    # this method can be used for visualization of random formulas from comments
+    # visualization_sample(comment_parser, dic_formula_comment_id, latex_dir)
 
 
 if __name__ == '__main__':
