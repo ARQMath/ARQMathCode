@@ -118,7 +118,7 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
         for formula_id in lst_not_found_formula:
             file.write(str(formula_id) + "\n")
 
-    print(str(len(lst_not_found_formula)) + " formulas from comments in TSV are not in XML file")
+    print(str(len(lst_not_found_formula)) + " of comment formulas in TSV files are not available in XML file")
 
 
 def main():
