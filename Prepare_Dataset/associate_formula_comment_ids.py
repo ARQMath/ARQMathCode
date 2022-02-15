@@ -59,7 +59,7 @@ def find_already_assigned_formula_ids(cr):
     return
 
 
-def associate_formula_id_with_comment_id(comment_file_path, directory, accociation_file):
+def associate_formula_id_with_comment_id(comment_file_path, directory, accociation_file, missed_formula_file):
     # this method associate formula ids to comment ids (as tsv file)
     # reading xml comment file
     cr = CommentParserRecord(comment_file_path)
@@ -113,11 +113,11 @@ def associate_formula_id_with_comment_id(comment_file_path, directory, accociati
         for formula_id in dic_formula_id_comment_id:
             csv_writer.writerow([str(formula_id), str(dic_formula_id_comment_id[formula_id])])
 
-    with open("missed_formulas_comment_before_correction.txt", "w", encoding="utf-8") as file:
+    with open(missed_formula_file, "w", encoding="utf-8") as file:
         for formula_id in lst_not_found_formula:
             file.write(str(formula_id) + "\n")
 
-    print(str(len(lst_not_found_formula)) + " formulas in TSV are not in comment file")
+    print(str(len(lst_not_found_formula)) + " formulas from comments in TSV are not in XML file")
 
 
 def main():
@@ -129,7 +129,8 @@ def main():
     comment_file = args['oc']
     latex_dir = args['ldir']
     association_file = "formula_comment_id.tsv"
-    associate_formula_id_with_comment_id(comment_file, latex_dir, association_file)
+    missed_formula_file = "missed_formulas_comment_before_correction"
+    associate_formula_id_with_comment_id(comment_file, latex_dir, association_file, missed_formula_file)
 
 
 if __name__ == '__main__':

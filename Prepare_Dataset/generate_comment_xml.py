@@ -293,7 +293,7 @@ def convert_mse_arqmath_comment_file(old_comment_xml, new_comment_xml, latex_dir
     with open(new_comment_xml, "w", encoding="utf-8") as f:
         f.write(xml_str)
 
-    with open("not_found_comment_formulas.txt", "w", encoding="utf-8") as f:
+    with open("missed_formulas_comment_after_correction.txt", "w", encoding="utf-8") as f:
         for formula_id in list_not_found:
             f.write(str(formula_id) + "\n")
 
