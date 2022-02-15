@@ -211,7 +211,7 @@ def extract_formulas_from_topics(clef_home_directory_file_path):
 
 def main():
     "Extracting formulas from collection"
-    original_arqmath_dataset_directory = "Clef" #"C:/Users/Behrooz/Desktop/Clef"
+    original_arqmath_dataset_directory = "Clef"
     extract_formulas_from_MSE_dataset(original_arqmath_dataset_directory)
     "Extracting formulas from topics"
     extract_formulas_from_topics(original_arqmath_dataset_directory)
