@@ -12,11 +12,11 @@ import argparse
 import sys
 conf_path = os.getcwd()
 sys.path.append(conf_path)
-
 from Prepare_Dataset.generate_comment_xml import match_to_pattern, check_existence
 from bs4 import BeautifulSoup
 from Entity_Parser_Record.comment_parser_record import CommentParserRecord
-
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module='bs4')
 
 def read_formula_file(directory):
     """
