@@ -137,20 +137,21 @@ def main():
 
     post_parser = PostParserRecord(new_xml)
 
-    print("Visual Samples")
-    # Printing 10 random formulas from questions and answers for visual (manual) checking
-    lst_random_questions = list(post_parser.map_questions.keys())
-    random.shuffle(lst_random_questions)
-    lst_random_questions = lst_random_questions[:5]
-    lst_random_answers = list(post_parser.map_just_answers.keys())
-    random.shuffle(lst_random_answers)
-    lst_random_answers = lst_random_answers[:5]
-    generate_visual_test(post_parser, dic_post_id_formula_ids, dic_formula_id_latex, lst_random_questions,
-                         lst_random_answers)
+    # print("Visual Samples")
+    # # Printing 10 random formulas from questions and answers for visual (manual) checking
+    # lst_random_questions = list(post_parser.map_questions.keys())
+    # random.shuffle(lst_random_questions)
+    # lst_random_questions = lst_random_questions[:5]
+    # lst_random_answers = list(post_parser.map_just_answers.keys())
+    # random.shuffle(lst_random_answers)
+    # lst_random_answers = lst_random_answers[:5]
+    # generate_visual_test(post_parser, dic_post_id_formula_ids, dic_formula_id_latex, lst_random_questions,
+    #                      lst_random_answers)
 
     print("\nChecking all the formulas located correctly")
+    #
     lst_missed_ids = check_all_formulas_located(post_parser, dic_post_id_formula_ids)
-    print(str(len(set(lst_missed_ids)))+" formulas are not located in math-container tag")
+    print(str(len(set(lst_missed_ids)))+" formulas are in TSV files and not located in math-container tag in XML file")
 
 
 if __name__ == '__main__':
