@@ -1,0 +1,31 @@
+#!/bin/bash
+
+usage() {
+	echo "This script generates xml files for task 1 and 2 and latex tsv file of formulas in topics "
+	echo "usage: $0 [-pf] [-qid] [-ff]"
+  echo "  -pd  original MSE post file path"
+  echo "  -qid  file that contains topic question ids in each line"
+  echo "  -ff  file that has topics formula for task 2"
+	}
+
+# check whether user had supplied -h or --help . If yes display usage
+if [[ $# == "--help" || $# == "-h" ]];
+then
+  usage
+  exit 1
+fi
+
+# if less than three arguments supplied, display usage
+if [  $# -le 2 ]
+then
+  usage
+  exit 1
+fi
+
+pd=$1
+qid=$2
+ff=$3
+
+echo "[Generating HTML thread files]"
+python3 Prepare_Dataset/generate_topics_xml.py -pf "$pd" -qid "$qid" -ff "$ff"
+echo "[Done]"
