@@ -5,9 +5,18 @@ As an alternative to the install command, you can also build a Docker image usin
 
 Run the code `latexml_conversions.py` that converts the sample TSV file `1_test_latex.tsv` to its opt and slt files.
 
-Run the code on LaTex TSV files provided on ARQMath Google drive, [here](https://drive.google.com/drive/u/1/folders/1o0JnMlyCtNCnW4cq7xwh_btr7qM36mZz), after decompressing the file.
+Run the code on LaTeX TSV files provided on ARQMath Google drive, [here](https://drive.google.com/drive/u/1/folders/1o0JnMlyCtNCnW4cq7xwh_btr7qM36mZz), after decompressing the file.
 Here is the sample command to extract intermediate MathML representations:
 ```
 python3 latexml_conversions.py ./latex_representation_v3  1 ./conversion_results
 ```
 where `latex_representation_v3` is the directory having the LaTex TSV filse and `conversion_results` is the directory to save the intermediate representations.
+
+## Note on reproducibility
+
+The `latexml_conversions.py` code is non-deterministic in that will pass formulae to LaTeXML in different order every time you run it.
+This is because we pass formulae to LaTeXML in batches and LaTeXML makes it difficult to detect whether an error has occured during the conversion.
+Therefore, running `latexml_conversions.py` several times will produce several sets of results, where different formulae failed to convert.
+Combining the different sets of results will therefore greatly improve your conversion rates.
+
+In our experiments, we received ca 15K failures per a TSV file in a single run. Combining two runs reduced the failures to ca 6K per a TSV file.
