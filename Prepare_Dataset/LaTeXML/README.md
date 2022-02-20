@@ -20,3 +20,5 @@ Therefore, running `latexml_conversions.py` several times will produce several s
 Combining the different sets of results will therefore greatly improve your conversion rates.
 
 In our experiments, we received ca 15K failures per a TSV file in a single run. Combining two runs reduced the failures to ca 6K per a TSV file.
+
+For a more technically advanced approach that is fully deterministic and with higher conversion rate, please see the [latexml-runner](https://github.com/dginev/latexml-runner/releases/tag/0.1.1) by @dginev.
