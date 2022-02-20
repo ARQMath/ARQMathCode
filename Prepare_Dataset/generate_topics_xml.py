@@ -223,9 +223,9 @@ def main():
     topic_question_id_file_path = args['qid']
     topic_formula_file_path = args['ff']
 
-    latex_formula_tsv_file = "./Topics_2022_Formulas_Latex.v0.1.tsv"
-    xml_task1 = "./Topics_Task1_2022_v0.1.xml"
-    xml_task2 = "./Topics_Task2_2022_v0.1.xml"
+    latex_formula_tsv_file = "./Topics_Formulas_Latex.v0.1.tsv"
+    xml_task1 = "./Topics_Task1_v0.1.xml"
+    xml_task2 = "./Topics_Task2_v0.1.xml"
 
     print("reading post xml file")
     post_reader = PostParserRecord(post_file_path)
