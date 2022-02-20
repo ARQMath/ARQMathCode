@@ -4,17 +4,20 @@ import re
 from post_reader_record import DataReaderRecord
 
 
-def find_patterns_in_text(formula_double_dollar, input_text, formula_counter, formula_index_map):
+def find_patterns_in_text(formula_double_dollar, input_text, formula_counter, formula_index_map, start_pattern,
+                          end_pattern):
+    tsv_formulas = {}
     for string in formula_double_dollar:
         if "FXXF_" in string:
             continue
 
-        original_formula = "<span class=\"math-container\">$$" + string + "$$</span>"
+        original_formula = start_pattern + string + end_pattern
         fake_text = "FXXF_" + str(formula_counter)
         formula_index_map[fake_text] = original_formula
         input_text = input_text.replace(original_formula, " " + fake_text + " ", 1)
         formula_counter += 1
-    return input_text, formula_counter, formula_index_map
+        tsv_formulas[formula_counter] = string
+    return input_text, formula_counter, formula_index_map, tsv_formulas
 
 
 def get_list_of_formulas(input_text):
@@ -28,7 +31,7 @@ def get_list_of_formulas(input_text):
 
     "Formulas are located between 2 dollar signs in latex, so if there no or only one we have no formula in the text"
     if input_text.count("$") == 0 or input_text.count("$") == 1:
-        return latex_formulas
+        return latex_formulas, {}
 
     """
     There are 5 patterns in MSE dataset for latex formula; considering a+b we can have one of these:
@@ -53,24 +56,46 @@ def get_list_of_formulas(input_text):
     FXXF_1 : $a+b$ named formula_index_map. 
     """
     formula_index_map = {}
+    original_formulas = {}
     """
     Here we check the 5 patterns
     """
     formula_double_dollar = re.findall('<span class="math-container">\$\$(.+?)\$\$</span>', input_text)
-    input_text, counter, formula_index_map = find_patterns_in_text(formula_double_dollar,
-                                                                   input_text, counter, formula_index_map)
+    input_text, counter, formula_index_map, detected_formulas = find_patterns_in_text(formula_double_dollar,
+                                                                                      input_text, counter,
+                                                                                      formula_index_map,
+                                                                                      '<span class="math-container">$$',
+                                                                                      "$$</span>")
+    original_formulas.update(detected_formulas)
+
     formula_double_dollar = re.findall('<span class="math-container">\$(.+?)\$</span>', input_text)
-    input_text, counter, formula_index_map = find_patterns_in_text(formula_double_dollar,
-                                                                   input_text, counter, formula_index_map)
+    input_text, counter, formula_index_map, detected_formulas = find_patterns_in_text(formula_double_dollar,
+                                                                                      input_text, counter,
+                                                                                      formula_index_map,
+                                                                                      '<span class="math-container">$',
+                                                                                      '$</span>')
+    original_formulas.update(detected_formulas)
+
     formula_double_dollar = re.findall('<span class="math-container">(.+?)</span>', input_text)
-    input_text, counter, formula_index_map = find_patterns_in_text(formula_double_dollar,
-                                                                   input_text, counter, formula_index_map)
+    input_text, counter, formula_index_map, detected_formulas = find_patterns_in_text(formula_double_dollar,
+                                                                                      input_text, counter,
+                                                                                      formula_index_map,
+                                                                                      '<span class="math-container">',
+                                                                                      '</span>')
+    original_formulas.update(detected_formulas)
+
     formula_double_dollar = re.findall('\$\$(.+?)\$\$', input_text)
-    input_text, counter, formula_index_map = find_patterns_in_text(formula_double_dollar,
-                                                                   input_text, counter, formula_index_map)
+    input_text, counter, formula_index_map, detected_formulas = find_patterns_in_text(formula_double_dollar,
+                                                                                      input_text, counter,
+                                                                                      formula_index_map, "$$", "$$")
+    original_formulas.update(detected_formulas)
+
     formula_double_dollar = re.findall('\$(.+?)\$', input_text)
-    input_text, counter, formula_index_map = find_patterns_in_text(formula_double_dollar,
-                                                                   input_text, counter, formula_index_map)
+    input_text, counter, formula_index_map, detected_formulas = find_patterns_in_text(formula_double_dollar,
+                                                                                      input_text, counter,
+                                                                                      formula_index_map, "$", "$")
+    original_formulas.update(detected_formulas)
+
     """
     formula_index_map now contains all the formula, we should sort them based on their order appearance in the text; 
     e.g.: 
@@ -90,7 +115,7 @@ def get_list_of_formulas(input_text):
         latex_formulas.append(formula_index_map[formula[0]])
     """What is returned here is a list of formulas recognized in the text in the format they are in MSE which can
     be one of the five above."""
-    return latex_formulas
+    return latex_formulas, original_formulas
 
 
 def extract_formulas_from_MSE_dataset(clef_home_directory_file_path):
@@ -159,62 +184,10 @@ def extract_formulas_from_MSE_dataset(clef_home_directory_file_path):
                             formula_id += 1
 
 
-def read_question_id(file_path):
-    """
-    This input file contains list of question ids that represents the question ids of topics for
-    task one.
-    """
-    file = open(file_path)
-    line = file.readline().strip()
-    lst_ids = []
-    while line:
-        lst_ids.append(int(line))
-        line = file.readline().strip()
-    return lst_ids
-
-
-def extract_formulas_from_topics(clef_home_directory_file_path):
-    dr = DataReaderRecord(clef_home_directory_file_path)
-
-    """
-    This list will have the question ids [post id] of each of the topics.
-    """
-    lst_question_ids = read_question_id("queries.txt")
-
-    formula_id = 1
-    topic_id = 1
-
-    "the file that will save the topic formulas"
-    result_file = open("Formula_topics_latex.tsv", "w", encoding="utf-8", newline='')
-    csv_writer = csv.writer(result_file, delimiter='\t')
-    csv_writer.writerow(["id", "topic_id", "thread_id", "type", "formula"])
-
-    "iterating on the topics"
-    for question_id in lst_question_ids:
-        question = dr.post_parser.map_questions[question_id]
-        title = question.title
-        body = question.body
-
-        "extracting formulas from topic title"
-        formula_in_title = get_list_of_formulas(title)
-        for formula in formula_in_title:
-            csv_writer.writerow(["q_" + str(formula_id), "A." + str(topic_id), question_id, "title", formula])
-            formula_id += 1
-
-        "extracting formulas from topic body"
-        formulas_in_body = get_list_of_formulas(body)
-        for formula in formulas_in_body:
-            csv_writer.writerow(["q_" + str(formula_id), "A." + str(topic_id), question_id, "question", formula])
-            formula_id += 1
-        topic_id += 1
-
-
 def main():
     "Extracting formulas from collection"
     original_arqmath_dataset_directory = "Clef"
     extract_formulas_from_MSE_dataset(original_arqmath_dataset_directory)
-    "Extracting formulas from topics"
-    extract_formulas_from_topics(original_arqmath_dataset_directory)
 
 
 if __name__ == '__main__':
