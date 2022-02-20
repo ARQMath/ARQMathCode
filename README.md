@@ -113,7 +113,7 @@ Prepare_Dataset/commands/generate_html_threads ./ARQMath_Data ./CollectionByYear
 ```
 
 ### 4. Generating Topic Files
-This command is used to generate the topics XML files for task 1 and 2 with the TSV index files of formulas latex representations.
+This command is used to generate the topics XML files for task 1 and 2 with the TSV index files of formulas latex/slt/opt representations.
 **Data.** Download the Raw Math Stack Exchange XML file located [here](https://drive.google.com/drive/folders/1AJ41HKqGthixfmBMKphxXXU31goNLLGk?usp=sharing), named `Posts_cut2021.xml`.
 You need two other files one having the topic question ids for task 1 and the other having the topic formulas for task 2.
 They can be downloaded from [here](https://drive.google.com/drive/folders/1AJ41HKqGthixfmBMKphxXXU31goNLLGk?usp=sharing).
@@ -124,7 +124,8 @@ Prepare_Dataset/commands/generate_topic_files ./Posts_cut_2021.xml ./task1_2022_
 ```
 
 **Outputs.** Two XML files for task 1 and 2 will be generated in the root directory with names `Topics_Task1_v0.1.xml` and `Topics_Task2_v0.1.xml`, accordingly.
-Also, the TSV index file for the formulas in the topics will be generated in the file `Topics_Formulas_Latex.v0.1.tsv`.
+Also, the TSV index files for the formulas in the topics will be generated in the files `Topics_Formulas_Latex.v0.1.tsv`, 
+`Topics_Formulas_SLT.v0.1.tsv`, and `Topics_Formulas_OPT.v0.1.tsv`.
 ## Authors
 
 This code is provided by [ARQMath](https://www.cs.rit.edu/~dprl/ARQMath/) co-organizers Behrooz Mansouri.

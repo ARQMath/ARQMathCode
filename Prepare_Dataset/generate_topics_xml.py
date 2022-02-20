@@ -4,6 +4,7 @@ import xml.etree.cElementTree as ET
 from xml.dom import minidom
 import os
 import sys
+
 conf_path = os.getcwd()
 sys.path.append(conf_path)
 import argparse
@@ -12,6 +13,7 @@ from Entity_Parser_Record.post_parser_record import PostParserRecord
 from Prepare_Dataset.extract_formulas_collection import get_list_of_formulas
 from Prepare_Dataset.generate_post_xml import match_to_pattern
 from topic_file_reader import TopicReader
+from Prepare_Dataset.LaTeXML.latexml_conversions_topics import converting_latex_topics
 
 
 def read_question_id_file(file_path):
@@ -224,6 +226,8 @@ def main():
     topic_formula_file_path = args['ff']
 
     latex_formula_tsv_file = "./Topics_Formulas_Latex.v0.1.tsv"
+    slt_formula_tsv_file = "./Topics_Formulas_SLT.v0.1.tsv"
+    opt_formula_tsv_file = "./Topics_Formulas_OPT.v0.1.tsv"
     xml_task1 = "./Topics_Task1_v0.1.xml"
     xml_task2 = "./Topics_Task2_v0.1.xml"
 
@@ -233,7 +237,9 @@ def main():
     generate_topic_file_task_1(post_reader, topic_question_id_file_path, latex_formula_tsv_file, xml_task1)
     print("generation xml (TASK 2)")
     generate_topic_file_task_2(xml_task1, topic_formula_file_path, latex_formula_tsv_file, xml_task2)
-    print("Two XML files and a TSV Latex files are generated")
+    print("Generating SLT/OPT TSV index files")
+    converting_latex_topics(latex_formula_tsv_file, slt_formula_tsv_file, opt_formula_tsv_file)
+    print("Two XML files and Three TSV (Latex, SLT, OPT) files are generated")
 
 
 if __name__ == '__main__':
