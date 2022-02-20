@@ -15,7 +15,7 @@ where `latex_representation_v3` is the directory having the LaTex TSV filse and 
 ## Note on reproducibility
 
 The `latexml_conversions.py` code is non-deterministic in that it will pass formulae to LaTeXML in different order every time you run it.
-This is because we pass formulae to LaTeXML in batches and LaTeXML makes it difficult to detect whether an error has occured during the conversion.
+This is because we pass formulae to LaTeXML in batches and TeX makes it difficult to detect whether an error has occured during the conversion.
 Therefore, running `latexml_conversions.py` several times will produce several sets of results, where different formulae failed to convert.
 Combining the different sets of results will therefore greatly improve your conversion rates.
 
