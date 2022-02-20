@@ -24,7 +24,7 @@ class TopicReader:
     """
 
     def __init__(self, topic_file_path):
-        self.__map_topics = self.__read_topics(topic_file_path)
+        self.map_topics = self.__read_topics(topic_file_path)
 
     def __read_topics(self, topic_file_path):
         map_topics = {}
@@ -39,15 +39,15 @@ class TopicReader:
         return map_topics
 
     def get_topic(self, topic_id):
-        if topic_id in self.__map_topics:
-            return self.__map_topics[topic_id]
+        if topic_id in self.map_topics:
+            return self.map_topics[topic_id]
         return None
 
 
-"In this example, the title and the question body of topic with id A.1 is printed."
-topic_file_path = "Topics_V2.0.xml"
-topic_reader = TopicReader(topic_file_path)
-topic_id = "A.1"
-print(topic_reader.get_topic(topic_id).title)
-print(topic_reader.get_topic(topic_id).question)
-print(topic_reader.get_topic(topic_id).lst_tags)
+# "In this example, the title and the question body of topic with id A.1 is printed."
+# topic_file_path = "Topics_V2.0.xml"
+# topic_reader = TopicReader(topic_file_path)
+# topic_id = "A.1"
+# print(topic_reader.get_topic(topic_id).title)
+# print(topic_reader.get_topic(topic_id).question)
+# print(topic_reader.get_topic(topic_id).lst_tags)
