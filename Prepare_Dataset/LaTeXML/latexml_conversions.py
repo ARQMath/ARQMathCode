@@ -241,6 +241,7 @@ def extract_slt_opt_from_latex_file(file_path, formula_id_index, formula_latex_i
     dic_formula_id_formula_latex = get_latex_list(file_path, formula_id_index, formula_latex_index)
     # find all the unique latex strings to pass to LaTeXML
     unique_latex_strings = list(set(dic_formula_id_formula_latex.values()))
+    # sort by alphabet and then length
     unique_latex_strings.sort()
     unique_latex_strings.sort(key=len)
     # extract slt and opt
