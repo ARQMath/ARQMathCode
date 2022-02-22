@@ -140,7 +140,7 @@ def handle_percentage(latex_str):
 
 
 def validate_latex(latex_str):
-    if "\\text" in latex_str or "\\newcommand" in latex_str:
+    if "\\newcommand" in latex_str: #"\\text" in latex_str or
         return None
     latex_str = latex_str.replace("<p>", " ")
     latex_str = latex_str.replace("</p>", " ")
