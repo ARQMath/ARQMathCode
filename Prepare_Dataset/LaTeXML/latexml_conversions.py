@@ -25,12 +25,13 @@ LATEXMLC = [
     '--preload=amsmath',
     '--preload=amsfonts',
     '--preload={}'.format(join(dirname(latex_mml.__file__), "mws.sty.ltxml")),
+    # '--preload=amssymb',
     '--pmml',
     '--cmml',
     '--profile=fragment',
-#   '--whatsin=fragment',
-#   '--whatsout=fragment',
-#   '--format=html5',
+  # '--whatsin=fragment',
+  # '--whatsout=fragment',
+  # '--format=html5',
     '-',
 ]
 XML_NAMESPACES = {
@@ -141,19 +142,27 @@ def _get_conversion_results_worker(latex_list):
                         pmml_math_tokens = MathExtractor.isolate_pmml(math_tokens)
                         pmml_math_tokens = remove_noise(pmml_math_tokens)
                         pmml_math_element = unicode_to_tree(pmml_math_tokens)
-                        if cmml_math_element.xpath('//mathml:cerror', namespaces=XML_NAMESPACES):
-                            cmml_math_tokens = ''
-                            cmml_failure = ValueError('LaTeXML output contains <cerror> elements')
-                        else:
-                            etree.strip_tags(cmml_math_element, '{{{}}}semantics'.format(XML_NAMESPACES['mathml']))
-                            cmml_math_tokens = tree_to_unicode(cmml_math_element)
-                            cmml_failure = None
-                        if pmml_math_element.xpath('//mathml:cerror', namespaces=XML_NAMESPACES):
-                            pmml_math_tokens = ''
-                            pmml_failure = ValueError('LaTeXML output contains <cerror> elements')
-                        else:
-                            pmml_math_tokens = tree_to_unicode(pmml_math_element)
-                            pmml_failure = None
+
+                        # if cmml_math_element.xpath('//mathml:cerror', namespaces=XML_NAMESPACES):
+                        #     cmml_math_tokens = ''
+                        #     cmml_failure = ValueError('LaTeXML output contains <cerror> elements')
+                        # else:
+                        #     etree.strip_tags(cmml_math_element, '{{{}}}semantics'.format(XML_NAMESPACES['mathml']))
+                        #     cmml_math_tokens = tree_to_unicode(cmml_math_element)
+                        #     cmml_failure = None
+                        # if pmml_math_element.xpath('//mathml:cerror', namespaces=XML_NAMESPACES):
+                        #     pmml_math_tokens = ''
+                        #     pmml_failure = ValueError('LaTeXML output contains <cerror> elements')
+                        # else:
+                        #     pmml_math_tokens = tree_to_unicode(pmml_math_element)
+                        #     pmml_failure = None
+
+                        etree.strip_tags(cmml_math_element, '{{{}}}semantics'.format(XML_NAMESPACES['mathml']))
+                        cmml_math_tokens = tree_to_unicode(cmml_math_element)
+                        cmml_failure = None
+                        pmml_math_tokens = tree_to_unicode(pmml_math_element)
+                        pmml_failure = None
+
                     except Exception as e:
                         cmml_math_tokens = ''
                         pmml_math_tokens = ''
@@ -293,9 +302,9 @@ def convert_tsv_latex_write_output(latex_file_path, file_id, destination_root):
 
 
 def main():
-    source_root = sys.argv[1]
-    file_id = sys.argv[2]
-    destination_root = sys.argv[3]
+    source_root = "/home/bm3302/behrooz_new_code"#sys.argv[1]
+    file_id = "3"#sys.argv[2]
+    destination_root = "/home/bm3302/behrooz_new_code"#sys.argv[3]
     lst_failed_ids = convert_tsv_latex_write_output(source_root, file_id, destination_root)
     print('{} formulae failed to convert'.format(len(lst_failed_ids)))
 
