@@ -2,6 +2,8 @@ import csv
 import re
 import os
 import subprocess
+import sys
+
 from bs4 import BeautifulSoup
 
 
@@ -277,14 +279,20 @@ def apply_changes(dic_formula_id_latex, dic_formula_id_with_issues, lst_delete):
 
 
 def main():
-    file_path = "/home/bm3302/latex_representation_v3/5.tsv"
+    # TSV directory e.g. ./ latex_representations_v3
+    source_root = sys.argv[1]
+    # TSV file e.g. ./1
+    file_id = sys.argv[2]
+    file_path = source_root+"/"+file_id +".tsv"
+    print("reading TSV file")
     dic_formula_id_latex = read_tsv_latex_file(file_path)
+    print("applying validation and correction")
     dic_formula_id_with_issues, lst_delete = validating_dic_formulas(dic_formula_id_latex)
     modified_formulas = apply_changes(dic_formula_id_latex, dic_formula_id_with_issues, lst_delete)
+    print("checking latex strings with LACheck")
     unmatched1 = la_check_testing(modified_formulas)
-    print(len(unmatched1))
-# #
-# # modified_formulas = apply_changes(dic_formula_id_latex, {})
-# unmatched2 = la_check(dic_formula_id_latex)
-# main()
-print(handle_text_string("\\textbf{a+b}\\textit{\sqrt{2}}"))
+    print(len(unmatched1) + "formulas have unmatch issues")
+
+
+if __name__ == '__main__':
+    main()
