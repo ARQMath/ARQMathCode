@@ -288,7 +288,7 @@ def main():
     source_root = sys.argv[1]
     # TSV file e.g. ./1
     file_id = sys.argv[2]
-    file_path = source_root+"/"+file_id +".tsv"
+    file_path = source_root+"/" + file_id + ".tsv"
     print("reading TSV file")
     dic_formula_id_latex = read_tsv_latex_file(file_path)
     print("applying validation and correction")
@@ -296,7 +296,7 @@ def main():
     modified_formulas = apply_changes(dic_formula_id_latex, dic_formula_id_with_issues, lst_delete)
     print("checking latex strings with LACheck")
     unmatched1 = la_check_testing(modified_formulas)
-    print(len(unmatched1) + "formulas have unmatch issues")
+    print(str(len(unmatched1)) + " formulas have unmatched issues after correction applied")
 
 
 if __name__ == '__main__':
