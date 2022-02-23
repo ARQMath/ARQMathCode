@@ -3,9 +3,10 @@ import re
 import os
 import subprocess
 import sys
-
+import lxml.html
 from bs4 import BeautifulSoup
 
+html_tags = ['<html>', '<base>', '<head>', '<link>', '<meta>', '<style>', '<title>', '<body>', '<address>', '<article>', '<aside>', '<footer>', '<header>', '<h1>', '<h2>', '<h3>', '<h4>', '<h5>', '<h6>', '<main>', '<nav>', '<section>', '<dd>', '<div>', '<dl>', '<dt>', '<figcaption>', '<figure>', '<hr>', '<li>', '<ol>', '<p>', '<pre>', '<ul>', '<a>', '<abbr>', '<b>', '<bdi>', '<bdo>', '<br>', '<cite>', '<code>', '<data>', '<dfn>', '<em>', '<i>', '<kbd>', '<mark>', '<q>', '<rp>', '<rt>', '<ruby>', '<s>', '<samp>', '<small>', '<span>', '<strong>', '<sub>', '<sup>', '<time>', '<u>', '<var>', '<wbr>', '<area>', '<audio>', '<img>', '<map>', '<track>', '<video>', '<embed>', '<iframe>', '<object>', '<param>', '<picture>', '<portal>', '<source>', '<svg>', '<math>', '<canvas>', '<noscript>', '<script>', '<del>', '<ins>', '<caption>', '<col>', '<colgroup>', '<table>', '<tbody>', '<td>', '<tfoot>', '<th>', '<thead>', '<tr>', '<button>', '<datalist>', '<fieldset>', '<form>', '<input>', '<label>', '<legend>', '<meter>', '<optgroup>', '<option>', '<output>', '<progress>', '<select>', '<details>', '<dialog>', '<menu>', '<summary>', '<slot>', '<template>']
 
 def read_tsv_latex_file(file_path):
     # read the given tsv file and returns dic of formula id and latex representation
@@ -20,7 +21,7 @@ def read_tsv_latex_file(file_path):
     return dic_formula_id_latex_str
 
 
-def check_curly_bracket(latex_str):
+def handle_curly_bracket(latex_str):
     # handles the curly brackets unmatched
     stack = []
     i = 0
@@ -58,7 +59,7 @@ def check_curly_bracket(latex_str):
     return latex_str
 
 
-def check_begin_end_brackets(latex_str):
+def handle_begin_end_brackets(latex_str):
     # takes in the latex string and check the \begin{env} ... \end{env} delimiters
     if "\\begin" not in latex_str and "\\end" not in latex_str:
         return latex_str
@@ -172,19 +173,23 @@ def handle_text_string(latex_str):
     return "~"+latex_str
 
 
+def handle_html_tag(latex_str):
+    for html_tag in html_tags:
+        if html_tag in latex_str:
+            return ''
+    return latex_str
+
+
 def validate_latex(latex_str):
     if "\\newcommand" in latex_str or "\\def" in latex_str:
         return ''
 
     latex_str = handle_percentage(latex_str)
-    latex_str = check_begin_end_brackets(latex_str)
-    latex_str = check_curly_bracket(latex_str)
+    latex_str = handle_begin_end_brackets(latex_str)
+    latex_str = handle_curly_bracket(latex_str)
     latex_str = handle_dollar_issue(latex_str)
-
     latex_str = handle_text_string(latex_str)
-    has_html_tag = bool(BeautifulSoup(latex_str, "html.parser").find())
-    if has_html_tag:
-        return ''
+    latex_str = handle_html_tag(latex_str)
 
     return latex_str
 
@@ -194,7 +199,7 @@ def validating_dic_formulas(dic_formulas):
     lst_delete = []
     for formula_id in dic_formulas:
         latex = dic_formulas[formula_id]
-        # if formula_id in [594436]:
+        # if formula_id in [574397]:
         #     print("wait")
         validated_str = validate_latex(latex)
         if validated_str != latex:

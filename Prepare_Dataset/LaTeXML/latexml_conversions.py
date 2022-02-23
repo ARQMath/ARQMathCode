@@ -302,9 +302,9 @@ def convert_tsv_latex_write_output(latex_file_path, file_id, destination_root):
 
 
 def main():
-    source_root = "/home/bm3302/behrooz_new_code"#sys.argv[1]
-    file_id = "3"#sys.argv[2]
-    destination_root = "/home/bm3302/behrooz_new_code"#sys.argv[3]
+    source_root = sys.argv[1]
+    file_id = sys.argv[2]
+    destination_root = sys.argv[3]
     lst_failed_ids = convert_tsv_latex_write_output(source_root, file_id, destination_root)
     print('{} formulae failed to convert'.format(len(lst_failed_ids)))
 
