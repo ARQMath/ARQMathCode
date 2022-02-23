@@ -1,18 +1,21 @@
 import csv
 import re
+import os
 import subprocess
+from bs4 import BeautifulSoup
 
 
 def read_tsv_latex_file(file_path):
     # read the given tsv file and returns dic of formula id and latex representation
-    dic_formula_id_latex = {}
+    dic_formula_id_latex_str = {}
     with open(file_path, newline='') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter='\t', quotechar='"')
+        next(csv_reader)
         for row in csv_reader:
             formula_id = int(row[0])
             latex = row[5]
-            dic_formula_id_latex[formula_id] = latex
-    return dic_formula_id_latex
+            dic_formula_id_latex_str[formula_id] = latex
+    return dic_formula_id_latex_str
 
 
 def check_curly_bracket(latex_str):
@@ -22,12 +25,17 @@ def check_curly_bracket(latex_str):
     while i < len(latex_str):
         char = latex_str[i]
         if char == '}':
+            # Check if \} then pass
+            if i-1 >= 0 and latex_str[i-1] == "\\":
+                i += 1
+                continue
+            # Check if { is in stack then pop it
             if len(stack) > 0:
                 stack.pop()
             else:
-                # if there is mismatch insert {
-                # this code decides where to insert { -- it goes back till it finds } or beginning of the latex
-                # if } is found the { is inserted after }
+                # if there is mismatch, insert {. But where?
+                # it goes back till it finds } and insert { right after than
+                # if not found it will in beginning of the latex
                 # e.g {a+b} c/d} ==> {a+b} {c/d}
                 j = i - 1
                 while j > 0 and latex_str[j] != '}':
@@ -39,7 +47,8 @@ def check_curly_bracket(latex_str):
                     latex_str = "{" + latex_str
                 i += 1
         elif char == '{':
-            stack.append(char)
+            if i - 1 < 0 or latex_str[i - 1] != "\\":
+                stack.append(char)
         i += 1
     while len(stack) > 0:
         latex_str += '}'
@@ -49,8 +58,11 @@ def check_curly_bracket(latex_str):
 
 def check_begin_end_brackets(latex_str):
     # takes in the latex string and check the \begin{env} ... \end{env} delimiters
-    if "\\begin" not in latex_str and "end" not in latex_str:
+    if "\\begin" not in latex_str and "\\end" not in latex_str:
         return latex_str
+
+    latex_str = latex_str.replace("\\begin {", "\\begin{")
+    latex_str = latex_str.replace("\\end {", "\\end{")
 
     # find all begin
     begin_items = re.findall(r'\\begin{(.+?)}', latex_str)
@@ -69,12 +81,12 @@ def check_begin_end_brackets(latex_str):
 
     for index in sorted(dic_index_begin_item):
         item = dic_index_begin_item[index]
-        begin_item = re.findall(r'\\begin{(.+?)}', item)[0]
+        begin_item = re.findall(r'\\begin{(.+?)}', item)
         # if appeared item is 'begin' then push it to stack
         if len(begin_item) > 0:
-            stack.append(begin_item)
+            stack.append(begin_item[0])
         else:
-            end = re.findall(r'\\end{(.+?)}', latex_str)[0]
+            end = re.findall(r'\\end{(.+?)}', item)[0]
             # if the end has no begin, include begin at first
             if len(stack) == 0 or stack[-1] != end:
                 latex_str = "\\begin{" + end + "}" + latex_str
@@ -93,8 +105,10 @@ def handle_dollar_issue(latex_str):
     result = ""
     # if set true, $ or $$ is seen and will start saving item between them
     save_chars = False
-    for i in range(len(latex_str)):
+    i = 0
+    while i < len(latex_str):
         if latex_str[i] == '$':
+            # Check if there are $$
             if i+1 < len(latex_str) and latex_str[i+1] == '$':
                 if len(stack) > 0 and stack[-1] == "$$":
                     return "$$"+result+"$$"
@@ -106,86 +120,171 @@ def handle_dollar_issue(latex_str):
             else:
                 if len(stack) > 0 and stack[-1] == "$":
                     return "$"+result+"$"
-                    # stack.pop()
                 else:
                     stack.append("$")
                     save_chars = True
         elif save_chars:
             result += latex_str[i]
+        i += 1
     sign = stack.pop()
+    if result == '':
+        return ''
     return sign + result + sign
 
 
 def handle_percentage(latex_str):
-    # handling the formula having % in them
-    # Replacing it with empty
-    return latex_str.replace("%", "")
+    # % sign is interpreted as ignore characters till \n is met
+    if '%' not in latex_str:
+        return latex_str
+    stack = []
+    result = ""
 
-    # stack = []
-    # result = ""
-    # if '%' not in latex_str:
-    #     return latex_str
-    # ignore = False
-    # for char in latex_str:
-    #     if char != '%' and not ignore:
-    #         result += char
-    #     else:
-    #         if stack[-1] == char:
-    #             ignore = False
-    #             stack.pop()
-    #         else:
-    #             ignore = True
-    #             stack.append(char)
-    # return char
+    ignore = False
+    i = 0
+    while i < len(latex_str):
+        char = latex_str[i]
+        if not ignore and char != '%':
+            result += char
+        elif ignore and char == '\n':
+            ignore = False
+            stack.pop()
+        elif char == '%' and not ignore:
+            if i-1 < 0 or latex_str[i-1] != '\\':
+                ignore = True
+                stack.append(char)
+            else:
+                result += char
+        i += 1
+    return result
+
+
+def handle_text_string(latex_str):
+    compiler = re.compile(r"\\text.*{(.+?)}")
+    lst_items = []
+    for item in compiler.finditer(latex_str):
+        lst_items.append(item.string)
+    temp_string = "".join(lst_items)
+    # This shows there is additional items with text tag which makes is LaTeXML able to parse it
+    if temp_string != latex_str:
+        return latex_str
+    return "~"+latex_str
 
 
 def validate_latex(latex_str):
-    if "\\newcommand" in latex_str: #"\\text" in latex_str or
-        return None
-    latex_str = latex_str.replace("<p>", " ")
-    latex_str = latex_str.replace("</p>", " ")
+    if "\\newcommand" in latex_str or "\\def" in latex_str:
+        return ''
 
     latex_str = handle_percentage(latex_str)
     latex_str = check_begin_end_brackets(latex_str)
     latex_str = check_curly_bracket(latex_str)
     latex_str = handle_dollar_issue(latex_str)
 
+    latex_str = handle_text_string(latex_str)
+    has_html_tag = bool(BeautifulSoup(latex_str, "html.parser").find())
+    if has_html_tag:
+        return ''
+
     return latex_str
 
 
 def validating_dic_formulas(dic_formulas):
     dic_formula_id_with_issues = {}
+    lst_delete = []
     for formula_id in dic_formulas:
         latex = dic_formulas[formula_id]
-        validate = validate_latex(latex)
-        if validate != latex:
-            dic_formula_id_with_issues[formula_id] = (latex, validate)
-    return dic_formula_id_with_issues
+        # if formula_id in [594436]:
+        #     print("wait")
+        validated_str = validate_latex(latex)
+        if validated_str != latex:
+            if validated_str == '':
+                lst_delete.append(formula_id)
+            else:
+                dic_formula_id_with_issues[formula_id] = (latex, validated_str)
+    return dic_formula_id_with_issues, lst_delete
 
 
-def la_check(dic_formulas):
-    print(dic_issues)
+def la_check_testing(dic_formulas):
+    # print(dic_issues)
     line = 1
     temp_dic = {}
     file = open("temp_la_check", "w", encoding="utf-8")
-    for formula_id in dic_issues:
-        latex = dic_issues[formula_id][1]
+    for formula_id in dic_formulas:
+        latex = dic_formulas[formula_id]
         latex = latex.replace("\n", " ")
         temp_dic[line] = formula_id
         file.write(latex+"\n")
         line += 1
     file.close()
     result = subprocess.run(['lacheck', 'temp_la_check'], stdout=subprocess.PIPE)
-    results = result.stdout.decode('utf-8').split("\n")
+    results = result.stdout.decode('ISO-8859-1').split("\n")
+    lst_issued = []
+    for res in results:
+        if "unmatched" in res:
+            if "math start" in res or "math end" in res:
+                continue
+            issued = res.split(":")[0].split("line")[1]
+            line_num = int(issued.strip())
+            if line_num in temp_dic:
+                formula_id = temp_dic[line_num]
+                latex = dic_formulas[formula_id]
+                lst_issued.append((formula_id, latex, res))
+    os.remove("temp_la_check")
+    return set(lst_issued)
+
+
+def la_check_verification(dic_formulas):
+    temp_dic = generate_la_check_input(dic_formulas)
+    result = subprocess.run(['lacheck', 'temp_la_check'], stdout=subprocess.PIPE)
+    results = result.stdout.decode('ISO-8859-1').split("\n")
     lst_issued = []
     for res in results:
         if "unmatched" in res:
             issued = res.split(":")[0].split("line")[1]
-            if int(issued.strip()) in dic_formulas:
-                lst_issued.append(formula_id)
+            line_num = int(issued.strip())
+            if line_num in temp_dic:
+                formula_id = temp_dic[line_num]
+                if formula_id not in lst_issued:
+                    lst_issued.append(formula_id)
+    os.remove("temp_la_check")
     return lst_issued
 
 
-dic_temp = {1: "$a+v{", 2: "\\begin{cases}a+v}", 3: "{a+b} c/d}"}
-dic_issues = validating_dic_formulas(dic_temp)
-print(la_check(dic_issues))
+def generate_la_check_input(dic_formulas):
+    line = 1
+    temp_dic = {}
+    file = open("temp_la_check", "w", encoding="utf-8")
+    for formula_id in dic_formulas:
+        latex = dic_formulas[formula_id]
+        latex = latex.replace("\n", " ")
+        temp_dic[line] = formula_id
+        file.write(latex + "\n")
+        line += 1
+    file.close()
+    return temp_dic
+
+
+def apply_changes(dic_formula_id_latex, dic_formula_id_with_issues, lst_delete):
+    pass_to_latex = {}
+    for formula_id in dic_formula_id_latex:
+        if formula_id in dic_formula_id_with_issues:
+            corrected = dic_formula_id_with_issues[formula_id][1]
+            corrected = corrected.strip()
+            if corrected != '':
+                pass_to_latex[formula_id] = corrected
+        elif formula_id not in lst_delete:
+            pass_to_latex[formula_id] = dic_formula_id_latex[formula_id]
+    return pass_to_latex
+
+
+def main():
+    file_path = "/home/bm3302/latex_representation_v3/5.tsv"
+    dic_formula_id_latex = read_tsv_latex_file(file_path)
+    dic_formula_id_with_issues, lst_delete = validating_dic_formulas(dic_formula_id_latex)
+    modified_formulas = apply_changes(dic_formula_id_latex, dic_formula_id_with_issues, lst_delete)
+    unmatched1 = la_check_testing(modified_formulas)
+    print(len(unmatched1))
+# #
+# # modified_formulas = apply_changes(dic_formula_id_latex, {})
+# unmatched2 = la_check(dic_formula_id_latex)
+# main()
+print(handle_text_string("\\textbf{a+b}\\textit{\sqrt{2}}"))
