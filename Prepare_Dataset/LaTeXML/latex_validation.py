@@ -162,13 +162,16 @@ def handle_percentage(latex_str):
 
 
 def handle_text_string(latex_str):
-    compiler = re.compile(r"\\text.*{(.+?)}")
+    compiler = re.compile(r"\\text.*?{(.+?)}")
     lst_items = []
     for item in compiler.finditer(latex_str):
-        lst_items.append(item.string)
+        tuple_span = item.span()
+        lst_items.append(latex_str[tuple_span[0]:tuple_span[1]])
     temp_string = "".join(lst_items)
     # This shows there is additional items with text tag which makes is LaTeXML able to parse it
     if temp_string != latex_str:
+        return latex_str
+    if latex_str == '':
         return latex_str
     return "~"+latex_str
 
@@ -185,9 +188,9 @@ def validate_latex(latex_str):
         return ''
 
     latex_str = handle_percentage(latex_str)
-    latex_str = handle_begin_end_brackets(latex_str)
-    latex_str = handle_curly_bracket(latex_str)
     latex_str = handle_dollar_issue(latex_str)
+    latex_str = handle_curly_bracket(latex_str)
+    latex_str = handle_begin_end_brackets(latex_str)
     latex_str = handle_text_string(latex_str)
     latex_str = handle_html_tag(latex_str)
 
@@ -199,8 +202,6 @@ def validating_dic_formulas(dic_formulas):
     lst_delete = []
     for formula_id in dic_formulas:
         latex = dic_formulas[formula_id]
-        # if formula_id in [574397]:
-        #     print("wait")
         validated_str = validate_latex(latex)
         if validated_str != latex:
             if validated_str == '':
@@ -227,7 +228,7 @@ def la_check_testing(dic_formulas):
     lst_issued = []
     for res in results:
         if "unmatched" in res:
-            if "math start" in res or "math end" in res:
+            if "math begin" in res or "math end" in res:
                 continue
             issued = res.split(":")[0].split("line")[1]
             line_num = int(issued.strip())
@@ -236,6 +237,36 @@ def la_check_testing(dic_formulas):
                 latex = dic_formulas[formula_id]
                 lst_issued.append((formula_id, latex, res))
     os.remove("temp_la_check")
+    return set(lst_issued)
+
+
+def la_check_testing_1(dic_formulas):
+    # print(dic_issues)
+    lst_issued = []
+    for formula_id in dic_formulas:
+        line = 1
+        temp_dic = {}
+        file = open("temp_la_check", "w", encoding="utf-8")
+        latex = dic_formulas[formula_id]
+        latex = latex.replace("\n", " ")
+        temp_dic[line] = formula_id
+        file.write(latex+"\n")
+        line += 1
+        file.close()
+        result = subprocess.run(['lacheck', 'temp_la_check'], stdout=subprocess.PIPE)
+        results = result.stdout.decode('ISO-8859-1').split("\n")
+
+        for res in results:
+            if "unmatched" in res:
+                if "math begin" in res or "math end" in res:
+                    continue
+                issued = res.split(":")[0].split("line")[1]
+                line_num = int(issued.strip())
+                if line_num in temp_dic:
+                    formula_id = temp_dic[line_num]
+                    latex = dic_formulas[formula_id]
+                    lst_issued.append((formula_id, latex, res))
+        os.remove("temp_la_check")
     return set(lst_issued)
 
 
@@ -281,23 +312,3 @@ def apply_changes(dic_formula_id_latex, dic_formula_id_with_issues, lst_delete):
         elif formula_id not in lst_delete:
             pass_to_latex[formula_id] = dic_formula_id_latex[formula_id]
     return pass_to_latex
-
-
-def main():
-    # TSV directory e.g. ./ latex_representations_v3
-    source_root = sys.argv[1]
-    # TSV file e.g. ./1
-    file_id = sys.argv[2]
-    file_path = source_root+"/" + file_id + ".tsv"
-    print("reading TSV file")
-    dic_formula_id_latex = read_tsv_latex_file(file_path)
-    print("applying validation and correction")
-    dic_formula_id_with_issues, lst_delete = validating_dic_formulas(dic_formula_id_latex)
-    modified_formulas = apply_changes(dic_formula_id_latex, dic_formula_id_with_issues, lst_delete)
-    print("checking latex strings with LACheck")
-    unmatched1 = la_check_testing(modified_formulas)
-    print(str(len(unmatched1)) + " formulas have unmatched issues after correction applied")
-
-
-if __name__ == '__main__':
-    main()
