@@ -7,6 +7,11 @@ import lxml.html
 from bs4 import BeautifulSoup
 
 html_tags = ['<html>', '<base>', '<head>', '<link>', '<meta>', '<style>', '<title>', '<body>', '<address>', '<article>', '<aside>', '<footer>', '<header>', '<h1>', '<h2>', '<h3>', '<h4>', '<h5>', '<h6>', '<main>', '<nav>', '<section>', '<dd>', '<div>', '<dl>', '<dt>', '<figcaption>', '<figure>', '<hr>', '<li>', '<ol>', '<p>', '<pre>', '<ul>', '<a>', '<abbr>', '<b>', '<bdi>', '<bdo>', '<br>', '<cite>', '<code>', '<data>', '<dfn>', '<em>', '<i>', '<kbd>', '<mark>', '<q>', '<rp>', '<rt>', '<ruby>', '<s>', '<samp>', '<small>', '<span>', '<strong>', '<sub>', '<sup>', '<time>', '<u>', '<var>', '<wbr>', '<area>', '<audio>', '<img>', '<map>', '<track>', '<video>', '<embed>', '<iframe>', '<object>', '<param>', '<picture>', '<portal>', '<source>', '<svg>', '<math>', '<canvas>', '<noscript>', '<script>', '<del>', '<ins>', '<caption>', '<col>', '<colgroup>', '<table>', '<tbody>', '<td>', '<tfoot>', '<th>', '<thead>', '<tr>', '<button>', '<datalist>', '<fieldset>', '<form>', '<input>', '<label>', '<legend>', '<meter>', '<optgroup>', '<option>', '<output>', '<progress>', '<select>', '<details>', '<dialog>', '<menu>', '<summary>', '<slot>', '<template>']
+temp = []
+for i in range(len(html_tags)):
+    temp.append("</"+html_tags[i][1:])
+html_tags.extend(temp)
+
 
 def read_tsv_latex_file(file_path):
     # read the given tsv file and returns dic of formula id and latex representation
@@ -312,3 +317,4 @@ def apply_changes(dic_formula_id_latex, dic_formula_id_with_issues, lst_delete):
         elif formula_id not in lst_delete:
             pass_to_latex[formula_id] = dic_formula_id_latex[formula_id]
     return pass_to_latex
+
