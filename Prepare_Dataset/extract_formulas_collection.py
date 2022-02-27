@@ -120,17 +120,13 @@ def get_list_of_formulas(input_text):
     return latex_formulas, original_formulas
 
 
-def extract_formulas_from_MSE_dataset(clef_home_directory_file_path, tsv_latex_file):
+def extract_formulas_from_MSE_dataset(clef_home_directory_file_path, latex_directory):
     "data reader to read the posts"
     dr = DataReaderRecord(clef_home_directory_file_path)
 
     "Formula ids"
     formula_id = 1
-
-    "where we save the formulas"
-    result_file = open(tsv_latex_file, "w", encoding="utf-8", newline='')
-    csv_writer = csv.writer(result_file, delimiter='\t')
-    csv_writer.writerow(["id", "post_id", "thread_id", "type", "formula"])
+    dic_records = {}
 
     "iterating through each of the files"
     for question_id in dr.post_parser.map_questions:
@@ -145,15 +141,15 @@ def extract_formulas_from_MSE_dataset(clef_home_directory_file_path, tsv_latex_f
         body = question.body
 
         "extracting the formulas from question title and writing them on the file"
-        formula_in_title = get_list_of_formulas(title)
+        _, formula_in_title = get_list_of_formulas(title)
         for formula in formula_in_title:
-            csv_writer.writerow([str(formula_id), str(question_id), str(question_id), "title", formula])
+            dic_records[formula_id] = [str(formula_id), str(question_id), str(question_id), "title", formula_in_title[formula]]
             formula_id += 1
 
         "extracting the formulas from question body and writing them on the file"
-        formulas_in_body = get_list_of_formulas(body)
+        _, formulas_in_body = get_list_of_formulas(body)
         for formula in formulas_in_body:
-            csv_writer.writerow([str(formula_id), str(question_id), str(question_id), "question", formula])
+            dic_records[formula_id] = [str(formula_id), str(question_id), str(question_id), "question", formulas_in_body[formula]]
             formula_id += 1
 
         "extracting the formulas from question comments and writing them on the file"
@@ -161,9 +157,9 @@ def extract_formulas_from_MSE_dataset(clef_home_directory_file_path, tsv_latex_f
             comment_list = dr.comment_parser.map_of_comments_for_post[question_id]
             "iteration on the comments for the question"
             for comment in comment_list:
-                formulas_in_comment = get_list_of_formulas(comment.text)
+                _, formulas_in_comment = get_list_of_formulas(comment.text)
                 for formula in formulas_in_comment:
-                    csv_writer.writerow([str(formula_id), str(question_id), str(question_id), "comment", formula])
+                    dic_records[formula_id] = [str(formula_id), str(question_id), str(question_id), "comment", formulas_in_comment[formula]]
                     formula_id += 1
 
         "extracting the formulas from the answers given to the question and writing them on the file"
@@ -171,31 +167,51 @@ def extract_formulas_from_MSE_dataset(clef_home_directory_file_path, tsv_latex_f
         if answer_list is not None:
             for answer in answer_list:
                 "answer body"
-                formulas_in_body = get_list_of_formulas(answer.body)
+                _, formulas_in_body = get_list_of_formulas(answer.body)
                 for formula in formulas_in_body:
-                    csv_writer.writerow([str(formula_id), str(answer.post_id), str(question_id), "answer", formula])
+                    dic_records[formula_id] = [str(formula_id), str(answer.post_id), str(question_id), "answer", formulas_in_body[formula]]
                     formula_id += 1
                 "answer comment"
                 if answer.post_id in dr.comment_parser.map_of_comments_for_post:
                     comment_list = dr.comment_parser.map_of_comments_for_post[answer.post_id]
                     for comment in comment_list:
-                        formulas_in_comment = get_list_of_formulas(comment.text)
+                        _, formulas_in_comment = get_list_of_formulas(comment.text)
                         for formula in formulas_in_comment:
-                            csv_writer.writerow(
-                                [str(formula_id), str(answer.post_id), str(question_id), "comment", formula])
+                            dic_records[formula_id] = [str(formula_id), str(answer.post_id), str(question_id), "comment",
+                                                       formulas_in_comment[formula]]
                             formula_id += 1
+    "where we save the formulas"
+    number_formulas = len(dic_records.keys())
+    count_limit = int(number_formulas/100)
+    counter = 0
+    file_id = 1
+    result_file = open(latex_directory+"/"+str(file_id)+".tsv", "w", encoding="utf-8", newline='')
+    csv_writer = csv.writer(result_file, delimiter='\t', quotechar='"')
+    csv_writer.writerow(["id", "post_id", "thread_id", "type", "formula"])
+
+    for key in sorted(dic_records):
+        csv_writer.writerow(dic_records[key])
+        counter += 1
+        if counter > count_limit:
+            counter = 0
+            file_id += 1
+            result_file.close()
+            result_file = open(latex_directory + "/" + str(file_id) + ".tsv", "w", encoding="utf-8", newline='')
+            csv_writer = csv.writer(result_file, delimiter='\t', quotechar='"')
+            csv_writer.writerow(["id", "post_id", "thread_id", "type", "formula"])
+    result_file.close()
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('-s', type=str, help='directory where math stack exchange snap shot')
-    parser.add_argument('-ldir', type=str, help='laTex TSV file')
+    parser.add_argument('-ldir', type=str, help='laTex directory for TSV files')
     args = vars(parser.parse_args())
 
     "Extracting formulas from collection"
     original_arqmath_dataset_directory = args['s']
-    tsv_latex_file = args['ldir']
-    extract_formulas_from_MSE_dataset(original_arqmath_dataset_directory, tsv_latex_file)
+    latex_directory = args['ldir']
+    extract_formulas_from_MSE_dataset(original_arqmath_dataset_directory, latex_directory)
 
 
 if __name__ == '__main__':

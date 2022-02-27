@@ -1,10 +1,10 @@
 #!/bin/bash
 
 usage() {
-	echo "This script generates a TSV file having all the latex formulas from the MathStackExchange Snapshot from the Internet Archive"
+	echo "This script generates TSV files having all the latex formulas from the MathStackExchange Snapshot from the Internet Archive"
 	echo "usage: $0 [-s] [-ldir]"
   echo "  -s  math stack exchange directory containing XML files"
-  echo "  -ldir latex TSV result file"
+  echo "  -ldir directory to save latex TSV files"
 	}
 
 # check whether user had supplied -h or --help . If yes display usage
