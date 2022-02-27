@@ -1,0 +1,30 @@
+#!/bin/bash
+
+usage() {
+	echo "This script generates a TSV file having all the latex formulas from the MathStackExchange Snapshot from the Internet Archive"
+	echo "usage: $0 [-s] [-ldir]"
+  echo "  -s  math stack exchange directory containing XML files"
+  echo "  -ldir latex TSV result file"
+	}
+
+# check whether user had supplied -h or --help . If yes display usage
+if [[ $# == "--help" || $# == "-h" ]];
+then
+  usage
+  exit 1
+fi
+
+# if less than three arguments supplied, display usage
+if [  $# -le 1 ]
+then
+  usage
+  exit 1
+fi
+
+s=$1
+ldir=$2
+
+
+echo "[Extracting formulas from Math Stack Exchange Post and Comment Files]"
+python3 Prepare_Dataset/extract_formulas_collection.py -s "$s" -ldir "$ldir"
+echo "[Done]"

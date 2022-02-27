@@ -1,6 +1,8 @@
 import csv
 import re
 
+import argparse
+
 from post_reader_record import DataReaderRecord
 
 
@@ -118,7 +120,7 @@ def get_list_of_formulas(input_text):
     return latex_formulas, original_formulas
 
 
-def extract_formulas_from_MSE_dataset(clef_home_directory_file_path):
+def extract_formulas_from_MSE_dataset(clef_home_directory_file_path, tsv_latex_file):
     "data reader to read the posts"
     dr = DataReaderRecord(clef_home_directory_file_path)
 
@@ -126,7 +128,7 @@ def extract_formulas_from_MSE_dataset(clef_home_directory_file_path):
     formula_id = 1
 
     "where we save the formulas"
-    result_file = open("Formula_topics_latex.tsv", "w", encoding="utf-8", newline='')
+    result_file = open(tsv_latex_file, "w", encoding="utf-8", newline='')
     csv_writer = csv.writer(result_file, delimiter='\t')
     csv_writer.writerow(["id", "post_id", "thread_id", "type", "formula"])
 
@@ -134,7 +136,7 @@ def extract_formulas_from_MSE_dataset(clef_home_directory_file_path):
     for question_id in dr.post_parser.map_questions:
         question = dr.post_parser.map_questions[question_id]
 
-        "we decided to leave the 2019 corpus out"
+        "Any data after 2018 is ignored in the collection"
         if int(question.creation_date.split("T")[0].split("-")[0]) > 2018:
             continue
 
@@ -185,9 +187,15 @@ def extract_formulas_from_MSE_dataset(clef_home_directory_file_path):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s', type=str, help='directory where math stack exchange snap shot')
+    parser.add_argument('-ldir', type=str, help='laTex TSV file')
+    args = vars(parser.parse_args())
+
     "Extracting formulas from collection"
-    original_arqmath_dataset_directory = "Clef"
-    extract_formulas_from_MSE_dataset(original_arqmath_dataset_directory)
+    original_arqmath_dataset_directory = args['s']
+    tsv_latex_file = args['ldir']
+    extract_formulas_from_MSE_dataset(original_arqmath_dataset_directory, tsv_latex_file)
 
 
 if __name__ == '__main__':
