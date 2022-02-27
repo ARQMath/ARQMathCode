@@ -15,7 +15,7 @@ def main():
     args = vars(parser.parse_args())
     arqmath_directory = args['ad']
     thread_directory = args['td']
-    dr = DataReaderRecord(arqmath_directory)
+    dr = DataReaderRecord(arqmath_directory, ".v1.3")
     dr.get_all_html_pages(thread_directory)
 
 
