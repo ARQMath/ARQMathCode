@@ -27,7 +27,20 @@ Note that the DataReader is used for reading the test collection. In order to re
 ## Creating Test Collection
 Here are set of commands to generate the dataset and run the commands.
 
-### 1. Generating XML file for Comments. 
+### 1. Extracting Formulas from MathStackExchange
+This command is used to generate TSV index file for the formulas inside the MathStackExchange Snapshot available in the 
+[Internet Archive](https://archive.org/download/stackexchange/math.stackexchange.com.7z). 
+
+**Data.** Download the Raw Math Stack Exchange XML file located on the Internet Archive. This data includes the XML files
+used in the ARQMath test collection. (Note that only the posts from 2010 to 2018 are included from *01-March-2020 snapshot*)
+The output of this command is list of TSV files containing the LaTex representations of formulas, which will be used to extract visual ids and MathML presentations.
+
+**Run Command.** From the root directory, run the command `extract_formulas_from_collection` similar to example below:
+```
+Prepare_Dataset/commands/extract_formulas_from_collection ./archive_mse ./latex_dir
+```
+
+### 2. Generating XML file for Comments. 
 
 The goal of this command is to regenerate the Comments.xml file with formulas being correctly annotated in the file.
 Each formula has a unique id and should be located in HTML span tag with class `math-container` and formula id.
@@ -55,7 +68,7 @@ annotated as letter 'd' in the word 'didn't'. Therefore, the previous annotation
 Finally, 10 formulas are randomly selected from those inside comments, and prints their id, latex and comment body for visual (manual) testing.
 It also, check all the formulas from the comments to print how many formulas are not correctly located in xml file.
 
-### 2. Generating XML file for Posts. 
+### 3. Generating XML file for Posts. 
 
 The goal of this command is to regenerate the Posts.xml file with formulas being correctly annotated in the file and also 
 detect the formulas in the ARQMath TSV formula index files that are not in the XML.
@@ -90,7 +103,7 @@ located inside the `math-container` tag.
 Finally, 10 formulas are randomly selected from those inside posts (answers and questions), and prints their id, latex and post body for visual (manual) testing.
 It also, check all the formulas from the posts to print how many formulas are not correctly located in xml file.
 
-### 3. Generating HTML Thread Files
+### 4. Generating HTML Thread Files
 This command generates the supplementary HTML thread files, that can be used for viewing question in a format similar to MathStackExchange.
 **Note** that these files are not used for the tasks and are just as a mean of visualization for analysis purposes.
 
@@ -112,7 +125,7 @@ Example command:
 Prepare_Dataset/commands/generate_html_threads ./ARQMath_Data ./CollectionByYear
 ```
 
-### 4. Generating Topic Files
+### 5. Generating Topic Files
 This command is used to generate the topics XML files for task 1 and 2 with the TSV index files of formulas latex/slt/opt representations.
 **Data.** Download the Raw Math Stack Exchange XML file located [here](https://drive.google.com/drive/folders/1AJ41HKqGthixfmBMKphxXXU31goNLLGk?usp=sharing), named `Posts_cut2021.xml`.
 You need two other files one having the topic question ids for task 1 and the other having the topic formulas for task 2.
