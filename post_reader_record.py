@@ -22,18 +22,18 @@ class DataReaderRecord:
         The main difference with the other DataReader is that each file is read record by record here.
     """
 
-    def __init__(self, root_file_path):
+    def __init__(self, root_file_path, version=""):
         """
         This class read all the data file in MSE ARQMath Dataset. The root file of data is taken as the input
         and then each of the files are read and the related data are linked together.
         :param root_file_path: The root directory of MSE ARQMath Dataset.
         """
-        post_file_path = root_file_path + "/Posts.V1.3.xml"
-        badges_file_path = root_file_path + "/Badges.V1.3.xml"
-        comments_file_path = root_file_path + "/Comments.V1.3.xml"
-        votes_file_path = root_file_path + "/Votes.V1.3.xml"
-        users_file_path = root_file_path + "/Users.V1.3.xml"
-        post_links_file_path = root_file_path + "/PostLinks.V1.3.xml"
+        post_file_path = root_file_path + "/Posts."+version+".xml"
+        badges_file_path = root_file_path + "/Badges."+version+".xml"
+        comments_file_path = root_file_path + "/Comments."+version+".xml"
+        votes_file_path = root_file_path + "/Votes."+version+".xml"
+        users_file_path = root_file_path + "/Users."+version+".xml"
+        post_links_file_path = root_file_path + "/PostLinks."+version+".xml"
         #post_history_file_path = root_file_path + "/PostHistory.xml"
 
         print("reading users")
