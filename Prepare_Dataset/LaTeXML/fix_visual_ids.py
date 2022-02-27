@@ -11,7 +11,7 @@ def read_qrel_formula_id_file(qrel_file):
     with open(qrel_file, newline='') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter='\t', quotechar='"')
         for row in csv_reader:
-            formula_id = int(row[0])
+            formula_id = int(row[2])
             score = int(row[3])
             if formula_id in dic_formula_id:
                 if score > dic_formula_id[formula_id]:
@@ -53,7 +53,7 @@ def read_slt_files(slt_intermediate_directory):
     return dic_formula_id_slt_string
 
 
-def read_latex_files(latex_tsv_directory, dic_formula_id_slt_string, lst_visual_id):
+def read_latex_files(latex_tsv_directory, dic_formula_id_slt_string):
     dic_formula_id_latex_string = {}
     dic_visual_id_formula_id_list = {}
 
@@ -68,14 +68,12 @@ def read_latex_files(latex_tsv_directory, dic_formula_id_slt_string, lst_visual_
                 visual_id = int(row[4])
                 latex_string = row[5]
                 latex_string = latex_string.replace(" ", "")
-                # Saving the correct visual ids
-                if visual_id not in lst_visual_id:
-                    if formula_id in dic_formula_id_slt_string:
-                        slt_string = dic_formula_id_slt_string[slt_string]
-                        dic_slt_string_visual_id[slt_string] = visual_id
-                        dic_latex_visual_id[latex_string] = visual_id
-                    else:
-                        dic_latex_visual_id[latex_string] = visual_id
+                if formula_id in dic_formula_id_slt_string:
+                    slt_string = dic_formula_id_slt_string[formula_id]
+                    dic_slt_string_visual_id[slt_string] = visual_id
+                    dic_latex_visual_id[latex_string] = visual_id
+                else:
+                    dic_latex_visual_id[latex_string] = visual_id
 
                 dic_formula_id_latex_string[formula_id] = latex_string
                 if visual_id in dic_visual_id_formula_id_list:
@@ -114,23 +112,38 @@ def validate_visual_ids(dic_visual_id_formula_id_list, dic_formula_id_latex_stri
                 has_issue = True
             if has_issue:
                 temp_list = [str(visual_id), str(len(slts)), str(len(latexs))]
-                temp_list.extend(lst_slt_string)
-                temp_list.extend(lst_latex_string)
+                temp_list.extend(list(set(lst_slt_string)))
+                temp_list.extend(list(set(lst_latex_string)))
                 csv_writer.writerow(temp_list)
 
     return lst_issues_visual_id
 
 
 def write_visual_ids_with_error_to_file(converted_slt_directory, latex_files_directory, result_file_path):
-    print("reading SLT files...\n")
+    print("reading SLT files")
     dic_formula_id_slt_string = read_slt_files(converted_slt_directory)
-    print("reading LaTex file...\n")
+    print("reading LaTex file")
     dic_formula_id_latex_string, dic_visual_id_formula_id_list, dic_slt_string_visual_id, dic_latex_visual_id = read_latex_files(
         latex_files_directory,
         dic_formula_id_slt_string)
     print("finding visual ids with wrong formula(s) in them... \n")
     lst_issues_visual_id = validate_visual_ids(dic_visual_id_formula_id_list, dic_formula_id_latex_string,
                                                dic_formula_id_slt_string, result_file_path)
+    # Removing the visual ids with issue
+    item_to_delete = []
+    for item in dic_slt_string_visual_id:
+        if dic_slt_string_visual_id[item] in lst_issues_visual_id:
+            item_to_delete.append(item)
+    for item in item_to_delete:
+        del dic_slt_string_visual_id[item]
+
+    item_to_delete = []
+    for item in dic_latex_visual_id:
+        if dic_latex_visual_id[item] in lst_issues_visual_id:
+            item_to_delete.append(item)
+    for item in item_to_delete:
+        del dic_latex_visual_id[item]
+
     return lst_issues_visual_id, dic_visual_id_formula_id_list, dic_formula_id_slt_string, dic_formula_id_latex_string, dic_slt_string_visual_id, dic_latex_visual_id
 
 
@@ -243,6 +256,14 @@ def fix_error(lst_issues_visual_id, dic_visual_id_formula_id_list, dic_formula_i
         formulas_changing = find_changing_formulas(lst_formula_ids, dic_formula_id_slt_string,
                                                    dic_formula_id_latex_string, qrel_formula_id_score_dic)
         # ###############
+        for formula_id in lst_formula_ids:
+            if formula_id not in formulas_changing:
+                if formula_id in dic_formula_id_slt_string:
+                    slt_string = dic_formula_id_slt_string[formula_id]
+                    dic_slt_string_visual_id[slt_string] = visual_id
+                else:
+                    latex = dic_formula_id_latex_string[formula_id]
+                    dic_latex_visual_id[latex] = visual_id
         for formula_id in formulas_changing:
             if formula_id in dic_formula_id_slt_string:
                 slt_string = dic_formula_id_slt_string[formula_id]
@@ -273,14 +294,16 @@ def main():
     latex_directory = sys.argv[2]
     file_path_visual_ids_with_issue = "visual_ids_with_issue.txt"
     file_path_changed_visual_ids = sys.argv[3]
-    qrel_file = sys.argv[4]
+    qrel_file = "qrel_task2_2021_formula_id_all.tsv"
     lst_issues_visual_id, dic_visual_id_formula_id_list, dic_formula_id_slt_string, dic_formula_id_latex_string, dic_slt_string_visual_id, dic_latex_visual_id = write_visual_ids_with_error_to_file(
         slt_directory, latex_directory, file_path_visual_ids_with_issue)
     qrel_formula_id_score_dic = read_qrel_formula_id_file(qrel_file)
     print("fixing the visual ids")
     dic_new_formula_visual_ids = fix_error(lst_issues_visual_id, dic_visual_id_formula_id_list,
                                            dic_formula_id_slt_string,
-                                           dic_formula_id_latex_string, dic_slt_string_visual_id, dic_latex_visual_id,
+                                           dic_formula_id_latex_string,
+                                           dic_slt_string_visual_id,
+                                           dic_latex_visual_id,
                                            qrel_formula_id_score_dic)
     # write changes to file
     with open(file_path_changed_visual_ids, "w", newline='', encoding="utf-8") as result_file:
@@ -288,7 +311,7 @@ def main():
         for formula_id in dic_new_formula_visual_ids:
             csv_writer.writerow(
                 [str(formula_id), dic_new_formula_visual_ids[formula_id][0], dic_new_formula_visual_ids[formula_id][1]])
-    print('{} formulae have changed formula id'.format(len(dic_new_formula_visual_ids.keys())))
+    print('{} formulae have changed visual id'.format(len(dic_new_formula_visual_ids.keys())))
 
 
 if __name__ == '__main__':
