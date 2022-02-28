@@ -1,8 +1,11 @@
 import csv
+import os
 import re
+import sys
 
+conf_path = os.getcwd()
+sys.path.append(conf_path)
 import argparse
-
 from post_reader_record import DataReaderRecord
 
 
