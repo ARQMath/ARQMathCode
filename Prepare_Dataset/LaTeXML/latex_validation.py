@@ -317,4 +317,3 @@ def apply_changes(dic_formula_id_latex, dic_formula_id_with_issues, lst_delete):
         elif formula_id not in lst_delete:
             pass_to_latex[formula_id] = dic_formula_id_latex[formula_id]
     return pass_to_latex
-
