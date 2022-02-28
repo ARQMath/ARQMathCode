@@ -55,7 +55,7 @@ def read_slt_files(slt_intermediate_directory):
     return dic_formula_id_slt_string
 
 
-def read_latex_files(latex_tsv_directory, dic_formula_id_slt_string, lst_visual_id):
+def read_latex_files(latex_tsv_directory, dic_formula_id_slt_string):
     dic_formula_id_latex_string = {}
     dic_visual_id_formula_id_list = {}
 
@@ -71,13 +71,13 @@ def read_latex_files(latex_tsv_directory, dic_formula_id_slt_string, lst_visual_
                 latex_string = row[5]
                 latex_string = latex_string.replace(" ", "")
                 # Saving the correct visual ids
-                if visual_id not in lst_visual_id:
-                    if formula_id in dic_formula_id_slt_string:
-                        slt_string = dic_formula_id_slt_string[slt_string]
-                        dic_slt_string_visual_id[slt_string] = visual_id
-                        dic_latex_visual_id[latex_string] = visual_id
-                    else:
-                        dic_latex_visual_id[latex_string] = visual_id
+
+                if formula_id in dic_formula_id_slt_string:
+                    slt_string = dic_formula_id_slt_string[slt_string]
+                    dic_slt_string_visual_id[slt_string] = visual_id
+                    dic_latex_visual_id[latex_string] = visual_id
+                else:
+                    dic_latex_visual_id[latex_string] = visual_id
 
                 dic_formula_id_latex_string[formula_id] = latex_string
                 if visual_id in dic_visual_id_formula_id_list:
@@ -133,6 +133,12 @@ def write_visual_ids_with_error_to_file(converted_slt_directory, latex_files_dir
     print("finding visual ids with wrong formula(s) in them... \n")
     lst_issues_visual_id = validate_visual_ids(dic_visual_id_formula_id_list, dic_formula_id_latex_string,
                                                dic_formula_id_slt_string, result_file_path)
+    for item in dic_latex_visual_id:
+        if dic_latex_visual_id[item] in lst_issues_visual_id:
+            del dic_latex_visual_id[item]
+    for item in dic_slt_string_visual_id:
+        if dic_slt_string_visual_id[item] in lst_issues_visual_id:
+            del dic_slt_string_visual_id[item]
     return lst_issues_visual_id, dic_visual_id_formula_id_list, dic_formula_id_slt_string, dic_formula_id_latex_string, dic_slt_string_visual_id, dic_latex_visual_id
 
 
