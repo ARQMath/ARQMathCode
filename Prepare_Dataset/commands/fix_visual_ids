@@ -1,0 +1,33 @@
+#!/bin/bash
+
+usage() {
+	echo "This script fixes the issue with visual ids by producing two files showing visual ids with issue and another showing formula new visual ids"
+	echo "usage: $0 [-ldir] [-con] [-qrel [-res]"
+  echo "  -ldir  directory of LaTex formula representations"
+  echo "  -con  directory in which intermediate MathML files are located"
+  echo "  -qrel  ARQMath-2 qrel file with formula ids"
+  echo "  -res  result TSV file to save formula id, old visual id, new visual id"
+	}
+
+# check whether user had supplied -h or --help . If yes display usage
+if [[ $# == "--help" || $# == "-h" ]];
+then
+  usage
+  exit 1
+fi
+
+# if less than three arguments supplied, display usage
+if [  $# -le 3 ]
+then
+  usage
+  exit 1
+fi
+
+ldir=$1
+con=$2
+qrel=$3
+res=$4
+
+echo "[Fixing Visual Ids]"
+python3 Prepare_Dataset/fix_visual_ids.py -ldir "$ldir" -con "$con" -qrel "$qrel" -res "$res"
+echo "[Done]"

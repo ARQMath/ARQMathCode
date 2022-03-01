@@ -280,10 +280,10 @@ def main():
 
     args = vars(parser.parse_args())
 
-    slt_directory = args['con']
     latex_directory = args['ldir']
-    file_path_changed_visual_ids = args['res']
+    slt_directory = args['con']
     qrel_file = args['qrel']
+    file_path_changed_visual_ids = args['res']
     file_path_visual_ids_with_issue = "visual_ids_with_issue.txt"
 
     lst_issues_visual_id, dic_visual_id_formula_id_list, dic_formula_id_slt_string, dic_formula_id_latex_string, dic_slt_string_visual_id, dic_latex_visual_id = write_visual_ids_with_error_to_file(
