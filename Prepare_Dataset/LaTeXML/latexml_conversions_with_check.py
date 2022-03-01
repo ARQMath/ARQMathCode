@@ -319,9 +319,7 @@ def extract_slt_opt_from_latex_file(file_path, formula_id_index, formula_latex_i
     return dic_formula_id_formula_latex, conversion_result_slt, conversion_result_opt, lst_failed, lst_delete, dic_formula_id_with_issues
 
 
-def convert_tsv_latex_write_output(latex_file_path, file_id, destination_root, FORMULA_BATCH_SIZE):
-    formula_id_index = 0
-    formula_latex_index = 5
+def convert_tsv_latex_write_output(latex_file_path, formula_id_index, formula_latex_index, file_id, destination_root, FORMULA_BATCH_SIZE):
     dic_formula_id_formula_latex, conversion_result_slt, conversion_result_opt, lst_failed, lst_delete, dic_formula_id_with_issues = \
         extract_slt_opt_from_latex_file(latex_file_path + "/" + file_id + ".tsv", formula_id_index, formula_latex_index, FORMULA_BATCH_SIZE)
 
@@ -362,7 +360,9 @@ def round_1(source_root, file_id):
         os.makedirs(destination_root_1)
 
     FORMULA_BATCH_SIZE = 100
-    lst_failed_ids = convert_tsv_latex_write_output(source_root, file_id, destination_root_1, FORMULA_BATCH_SIZE)
+    formula_id_index = 0
+    formula_latex_index = 5
+    lst_failed_ids = convert_tsv_latex_write_output(source_root, formula_id_index, formula_latex_index, file_id, destination_root_1, FORMULA_BATCH_SIZE)
     print('{} formulae failed to convert'.format(len(lst_failed_ids)))
 
 
@@ -404,7 +404,9 @@ def main():
     elif command == "p3":
         latex_directory = args['ldir']
         combine_results(combined_2, destination_root_3, combined_3, latex_directory)
-    elif command == "c":
+    elif command == "d":
+        if os.path.exists(destination_root_1):
+            shutil.rmtree(destination_root_1)
         if os.path.exists(destination_root_2):
             shutil.rmtree(destination_root_2)
         if os.path.exists(destination_root_3):
