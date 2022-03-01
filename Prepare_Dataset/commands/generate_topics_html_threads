@@ -26,7 +26,7 @@ fi
 tx1=$1
 hd1=$2
 tx2=$3
-hd2=$3
+hd2=$4
 
 echo "[Generating HTML thread files for topics]"
 python3 Prepare_Dataset/generate_topic_html.py -tx1 "$tx1" -hd1 "$hd1" -tx2 "$tx2" -hd2 "$hd2"
