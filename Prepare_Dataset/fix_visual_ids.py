@@ -1,14 +1,18 @@
 import os
 import csv
-
 import argparse
-from tangentcft.TangentS.math_tan.math_extractor import MathExtractor
 import sys
-
+conf_path = os.getcwd()
+sys.path.append(conf_path)
 csv.field_size_limit(sys.maxsize)
-
+from tangentcft.TangentS.math_tan.math_extractor import MathExtractor
 
 def read_qrel_formula_id_file(qrel_file):
+    """
+    ARQMath-2 task 2 qrel file was used to break the ties
+    This function reads the qrel and returns a dictionary of formula id and the max score assigned to it
+    among all the topics in ARQMath-2
+    """
     dic_formula_id = {}
     with open(qrel_file, newline='') as csv_file:
         csv_reader = csv.reader(csv_file, delimiter='\t', quotechar='"')
@@ -23,21 +27,12 @@ def read_qrel_formula_id_file(qrel_file):
     return dic_formula_id
 
 
-def read_raw_new_slt_files(slt_intermediate_directory):
-    dic_formula_id_slt = {}
-    for filename in os.listdir(slt_intermediate_directory):
-        if not filename.startswith("slt"):
-            continue
-        with open(slt_intermediate_directory + "/" + filename, newline='') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter='\t', quotechar='"')
-            for row in csv_reader:
-                formula_id = int(row[0])
-                slt = row[1]
-                dic_formula_id_slt[formula_id] = slt
-    return dic_formula_id_slt
-
-
 def read_slt_files(slt_intermediate_directory):
+    """
+    This method reads the intermediate SLT representations; note that these files are in TSV format
+    with formula id as the first column and SLT as the second column
+    The returned value is a dictionary of formulaid and SLT string extracted using Tangent-S system
+    """
     dic_formula_id_slt_string = {}
     for filename in os.listdir(slt_intermediate_directory):
         if not filename.startswith("slt"):
