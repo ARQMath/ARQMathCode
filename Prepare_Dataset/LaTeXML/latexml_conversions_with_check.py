@@ -2,10 +2,18 @@
 
 # -*- coding:utf-8 -*-
 import html
-import random
+import os
+import shutil
 from copy import copy
 from os.path import dirname, join
 import sys
+
+import argparse
+conf_path = os.getcwd()
+sys.path.append(conf_path)
+
+
+
 import subprocess
 from bs4 import BeautifulSoup
 from tangentcft.TangentS.math_tan import latex_mml
@@ -14,13 +22,18 @@ from lxml import etree
 import csv
 import xml.etree.ElementTree as ET
 # from tqdm import tqdm
-from latex_validation import la_check_verification, validating_dic_formulas
+from Prepare_Dataset.LaTeXML.post_processing_conversion_results import combine_results
+from Prepare_Dataset.LaTeXML.latexml_conversions_with_check_secondary import convert_tsv_latex_write_output_secondary
+from latex_validation import validating_dic_formulas
 from tqdm import tqdm
 
 csv.field_size_limit(sys.maxsize)
-
-
-FORMULA_BATCH_SIZE = 100
+destination_root_1 = "./temp_round1_intermediate"
+destination_root_2 = "./temp_round2_intermediate"
+destination_root_3 = "./temp_round3_intermediate"
+combined_1 = "./temp_round1_combined"
+combined_2 = "./temp_round12_combined"
+combined_3 = "./temp_round123_combined"
 
 LATEXMLC = [
     'latexmlc',
@@ -115,6 +128,17 @@ def execute(command, unicode_input):
         raise e
     unicode_output = str_output.decode('utf-8')
     return unicode_output
+
+
+def read_failed_formulas(failed_file):
+    lst_formula_id = []
+    file = open(failed_file, "r", encoding="utf-8")
+    line = file.readline()
+    while line:
+        line = line.strip()
+        lst_formula_id.append(line)
+        line = file.readline()
+    return lst_formula_id
 
 
 def _get_conversion_results_worker(latex_list):
@@ -217,13 +241,15 @@ def get_conversion_results(latex_list):
     return pmml_dict, cmml_dict
 
 
-def get_latex_list(file_path, formula_id_index, latex_index):
+def get_latex_list(file_path, formula_id_index, latex_index, lst_formula_id=None):
     dic_formulas = {}
     with open(file_path, newline='', encoding="utf-8") as csv_file:
         csv_reader = csv.reader(csv_file, delimiter='\t', quotechar='"')
         next(csv_reader)
         for row in csv_reader:
             formula_id = row[formula_id_index]
+            if lst_formula_id is not None and formula_id in lst_formula_id:
+                continue
             latex_string = row[latex_index]
             # if not latex_string.startswith("$"):
             #     latex_string = "$" + latex_string + "$"
@@ -233,7 +259,7 @@ def get_latex_list(file_path, formula_id_index, latex_index):
     return dic_formulas
 
 
-def convert_latex_strings(unique_latex_strings):
+def convert_latex_strings(unique_latex_strings, FORMULA_BATCH_SIZE):
     dic_slt = {}
     dic_opt = {}
 
@@ -247,7 +273,7 @@ def convert_latex_strings(unique_latex_strings):
     return dic_slt, dic_opt
 
 
-def extract_slt_opt_from_latex_file(file_path, formula_id_index, formula_latex_index):
+def extract_slt_opt_from_latex_file(file_path, formula_id_index, formula_latex_index, FORMULA_BATCH_SIZE):
     # read formula_id: latex file
     dic_formula_id_formula_latex = get_latex_list(file_path, formula_id_index, formula_latex_index)
     # check the validity of latex strings with lacheck tool
@@ -271,7 +297,7 @@ def extract_slt_opt_from_latex_file(file_path, formula_id_index, formula_latex_i
     unique_latex_strings.sort()
     unique_latex_strings.sort(key=len)
     # extract slt and opt
-    dic_slt, dic_opt = convert_latex_strings(unique_latex_strings)
+    dic_slt, dic_opt = convert_latex_strings(unique_latex_strings, FORMULA_BATCH_SIZE)
     lst_failed = []
     conversion_result_slt = {}
     conversion_result_opt = {}
@@ -293,11 +319,11 @@ def extract_slt_opt_from_latex_file(file_path, formula_id_index, formula_latex_i
     return dic_formula_id_formula_latex, conversion_result_slt, conversion_result_opt, lst_failed, lst_delete, dic_formula_id_with_issues
 
 
-def convert_tsv_latex_write_output(latex_file_path, file_id, destination_root):
+def convert_tsv_latex_write_output(latex_file_path, file_id, destination_root, FORMULA_BATCH_SIZE):
     formula_id_index = 0
     formula_latex_index = 5
     dic_formula_id_formula_latex, conversion_result_slt, conversion_result_opt, lst_failed, lst_delete, dic_formula_id_with_issues = \
-        extract_slt_opt_from_latex_file(latex_file_path + "/" + file_id + ".tsv", formula_id_index, formula_latex_index)
+        extract_slt_opt_from_latex_file(latex_file_path + "/" + file_id + ".tsv", formula_id_index, formula_latex_index, FORMULA_BATCH_SIZE)
 
     with open(destination_root+"/slt_"+file_id+".tsv", "w", newline='', encoding="utf-8") as result_file:
         csv_writer = csv.writer(result_file, delimiter='\t', quoting=csv.QUOTE_MINIMAL)
@@ -331,13 +357,63 @@ def convert_tsv_latex_write_output(latex_file_path, file_id, destination_root):
     return lst_failed
 
 
-def main():
-    source_root = sys.argv[1]
-    file_id = sys.argv[2]
-    destination_root = sys.argv[3]
-    lst_failed_ids = convert_tsv_latex_write_output(source_root, file_id, destination_root)
+def round_1(source_root, file_id):
+    if not os.path.exists(destination_root_1):
+        os.makedirs(destination_root_1)
+
+    FORMULA_BATCH_SIZE = 100
+    lst_failed_ids = convert_tsv_latex_write_output(source_root, file_id, destination_root_1, FORMULA_BATCH_SIZE)
     print('{} formulae failed to convert'.format(len(lst_failed_ids)))
 
 
-if __name__ == '__main__':
+def secondary(source_root, file_id, destination_root, FORMULA_BATCH_SIZE, previous_round):
+    if not os.path.exists(destination_root):
+        os.makedirs(destination_root)
+    lst_failed_ids = convert_tsv_latex_write_output_secondary(source_root, file_id, destination_root, previous_round, FORMULA_BATCH_SIZE)
+    print('{} formulae failed to convert'.format(len(lst_failed_ids)))
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-com', type=str, help='command to do')
+    parser.add_argument('-ldir', type=str, help='latex directory')
+    parser.add_argument('-fid', type=str, help='latex_file_id')
+
+    args = vars(parser.parse_args())
+
+    command = args['com']
+
+    if command == "r1":
+        latex_directory = args['ldir']
+        file_id = args['fid']
+        round_1(latex_directory, file_id)
+    elif command == "p1":
+        latex_directory = args['ldir']
+        combine_results(destination_root_1, destination_root_1, combined_1, latex_directory)
+    elif command == "r2":
+        latex_directory = args['ldir']
+        file_id = args['fid']
+        secondary(latex_directory, file_id, destination_root_2, 10, combined_1)
+    elif command == "p2":
+        latex_directory = args['ldir']
+        combine_results(combined_1, destination_root_2, combined_2, latex_directory)
+    elif command == "r3":
+        latex_directory = args['ldir']
+        file_id = args['fid']
+        secondary(latex_directory, file_id, destination_root_3, 1, combined_2)
+    elif command == "p3":
+        latex_directory = args['ldir']
+        combine_results(combined_2, destination_root_3, combined_3, latex_directory)
+    elif command == "c":
+        if os.path.exists(destination_root_2):
+            shutil.rmtree(destination_root_2)
+        if os.path.exists(destination_root_3):
+            shutil.rmtree(destination_root_3)
+        if os.path.exists(combined_1):
+            shutil.rmtree(combined_1)
+        if os.path.exists(combined_2):
+            shutil.rmtree(combined_2)
+
+
+if __name__ == "__main__":
     main()
