@@ -73,7 +73,7 @@ def read_latex_files(latex_tsv_directory, dic_formula_id_slt_string):
                 # Saving the correct visual ids
 
                 if formula_id in dic_formula_id_slt_string:
-                    slt_string = dic_formula_id_slt_string[slt_string]
+                    slt_string = dic_formula_id_slt_string[formula_id]
                     dic_slt_string_visual_id[slt_string] = visual_id
                     dic_latex_visual_id[latex_string] = visual_id
                 else:
