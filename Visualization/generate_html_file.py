@@ -1,7 +1,7 @@
 import html
 from bs4 import BeautifulSoup
-template_file = "../Visualization/template.html"
-template_file_topic = "../Visualization/template_topic.html"
+template_file = "Visualization/template.html"
+template_file_topic = "Visualization/template_topic.html"
 
 
 def format_formulas(temp_text):
