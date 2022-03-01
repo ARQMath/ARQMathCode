@@ -1,0 +1,33 @@
+#!/bin/bash
+
+usage() {
+	echo "This script generates visual ids for each formula inside the test collection, later used for evaluation of task 2"
+	echo "usage: $0 [-ldir] [-v] [-con] [-res]"
+  echo "  -ldir  directory of LaTex formula representations"
+  echo "  -v  visual id file"
+  echo "  -con  directory in which intermediate MathML files are located"
+  echo "  -res  result TSV file to save (formula id, visual id)"
+	}
+
+# check whether user had supplied -h or --help . If yes display usage
+if [[ $# == "--help" || $# == "-h" ]];
+then
+  usage
+  exit 1
+fi
+
+# if less than three arguments supplied, display usage
+if [  $# -le 3 ]
+then
+  usage
+  exit 1
+fi
+
+ldir=$1
+v=$2
+con=$3
+res=$4
+
+echo "[Generating HTML thread files]"
+python3 Prepare_Dataset/formula_index_tsv_final.py -ldir "$ldir" -v "$v" -con "$con" -res "$res"
+echo "[Done]"
