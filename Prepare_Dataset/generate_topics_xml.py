@@ -50,7 +50,7 @@ def read_topic_formulas(formula_file_path):
 
 
 def annotate_formulas(text, dic_formula_id_latex):
-    text = text.replace("\r", "\n", text.count("\r"))
+    text = text.replace("\n", " ", text.count("\n"))
     "Iteration on the formulas in the current text"
 
     soreted_formula_ids = sorted(dic_formula_id_latex, key=lambda k: len(dic_formula_id_latex[k]), reverse=True)
@@ -174,10 +174,11 @@ def generate_topic_file_task_1(post_reader, file_question_ids, result_formula_ts
             question = post_reader.map_questions[question_id]
             title = question.title
             title = html.unescape(title)
+            title = title.replace("\n", " ")
             body = question.body
 
             body = html.unescape(body)
-
+            body = body.replace("\n", " ")
             "extracting formulas from topic title"
             _, formula_in_title = get_list_of_formulas(title)
             dic_formula_id = {}
@@ -188,10 +189,10 @@ def generate_topic_file_task_1(post_reader, file_question_ids, result_formula_ts
                 formula_id += 1
             title = annotate_formulas(title, dic_formula_id)
             "extracting formulas from topic body"
-            _, formula_in_title = get_list_of_formulas(body)
+            _, formula_in_body = get_list_of_formulas(body)
             dic_formula_id = {}
-            for f_id in formula_in_title:
-                latex = formula_in_title[f_id]
+            for f_id in formula_in_body:
+                latex = formula_in_body[f_id]
                 csv_writer.writerow(["q_" + str(formula_id), "A." + str(topic_id), question_id, "body", latex])
                 dic_formula_id[formula_id] = latex
                 formula_id += 1
@@ -221,13 +222,13 @@ def main():
     parser.add_argument('-qid', type=str, help='file that contains topic question ids in each line')
     parser.add_argument('-ff', type=str, help='file that has the topics formula for task 2')
     args = vars(parser.parse_args())
-    post_file_path = args['pf']
-    topic_question_id_file_path = args['qid']
-    topic_formula_file_path = args['ff']
+    post_file_path = "/home/bm3302/Posts_cut_2021.xml"#args['pf']
+    topic_question_id_file_path = "/home/bm3302/task1_2022_topics.tsv"#args['qid']
+    topic_formula_file_path = "/home/bm3302/task2_2022_formula_topics.tsv"#args['ff']
 
-    latex_formula_tsv_file = "./Topics_Formulas_Latex.v0.1.tsv"
-    slt_formula_tsv_file = "./Topics_Formulas_SLT.v0.1.tsv"
-    opt_formula_tsv_file = "./Topics_Formulas_OPT.v0.1.tsv"
+    latex_formula_tsv_file = "../Topics_Formulas_Latex.v0.1.tsv"
+    slt_formula_tsv_file = "../Topics_Formulas_SLT.v0.1.tsv"
+    opt_formula_tsv_file = "../Topics_Formulas_OPT.v0.1.tsv"
     xml_task1 = "./Topics_Task1_v0.1.xml"
     xml_task2 = "./Topics_Task2_v0.1.xml"
 

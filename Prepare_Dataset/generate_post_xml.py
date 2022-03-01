@@ -137,11 +137,16 @@ def match_to_pattern(formula, text):
         map, formulas are sorted based on their order in the original, so we use these 6 format, find their first
         occurrence and replace them with our desired text.
         """
+    # text = text.replace("\n", "")
     map_index = {}
-    text1 = "<span class=\"math-container\">$$" + formula + "$$</span>"
+    text1 = "<span class=\"math-container\">$$ " + formula + " $$</span>"
     map_index[text1] = text.find(text1)
+    text7 = "<span class=\"math-container\">$$" + formula + "$$</span>"
+    map_index[text7] = text.find(text7)
     text2 = "<span class=\"math-container\">$" + formula + "$</span>"
     map_index[text2] = text.find(text2)
+    text8 = "<span class=\"math-container\">$$" + formula + "$$</span>"
+    map_index[text8] = text.find(text8)
     text3 = "<span class=\"math-container\">" + formula + "</span>"
     map_index[text3] = text.find(text3)
     text4 = "$$" + formula + "$$"
