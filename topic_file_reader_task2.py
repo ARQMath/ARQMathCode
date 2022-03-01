@@ -41,7 +41,7 @@ class TopicReader:
             formula_latex = child[1].text
             title = child[2].text
             question = child[3].text
-            tags = child[4].text
+            tags = child[4].text.split(",")
             map_topics[topic_id] = Topic(topic_id, formula_id, formula_latex, title, question, tags)
         return map_topics
 
