@@ -1,10 +1,11 @@
 import html
 from bs4 import BeautifulSoup
-template_file = "Visualization/template.html"
+template_file = "../Visualization/template.html"
+template_file_topic = "../Visualization/template_topic.html"
 
 
 def format_formulas(temp_text):
-    soup = BeautifulSoup(temp_text)
+    soup = BeautifulSoup(temp_text, 'html.parser')
     spans = soup.find_all('span', {'class': 'math-container'})
     for span in spans:
         formula = span.text
@@ -47,6 +48,14 @@ class HtmlGenerator:
         temp = HtmlGenerator.replace_item("#ASKERINFO#", user_html, temp)
         temp = HtmlGenerator.replace_item("#QCOMMENTS#", comment_html, temp)
         temp = HtmlGenerator.replace_item("#ANSWERS#", answer_html, temp)
+        temp = format_formulas(temp)
+        return temp
+
+    @staticmethod
+    def generate_topic(html, title, post, tag_lst):
+        temp = HtmlGenerator.replace_item("#TITLE#", title, html)
+        temp = HtmlGenerator.replace_item("#POST#", post, temp)
+        temp = HtmlGenerator.generate_tags(temp, tag_lst)
         temp = format_formulas(temp)
         return temp
 
@@ -254,3 +263,80 @@ class HtmlGenerator:
             except Exception as er:
                 print("issue generating html file for query:" + str(question_id))
                 print(str(er))
+
+    @staticmethod
+    def task1_html_view(topic_id, title, question_body, lst_tags, html_directory):
+        html = HtmlGenerator.read_html(template_file_topic)
+        html = HtmlGenerator.generate_topic(html, title, question_body, lst_tags)
+        HtmlGenerator.save_html(html_directory +"/"+ str(topic_id) + ".html", html)
+
+
+    @staticmethod
+    def questions_to_html_topics(topic_id, title, post, tag_lst, html_directory):
+        html = HtmlGenerator.read_html(template_file)
+        temp = HtmlGenerator.replace_item("#TITLE#", title, html)
+        temp = HtmlGenerator.replace_item("#QID#", str(topic_id), temp)
+        temp = HtmlGenerator.replace_item("#QSCORE#", "", temp)
+        temp = HtmlGenerator.replace_item("#POST#", post, temp)
+        temp = HtmlGenerator.replace_item("#ANSWERCOUNT#", "", temp)
+        temp = HtmlGenerator.generate_tags(temp, tag_lst)
+        temp = HtmlGenerator.replace_item("#ASKERINFO#", "", temp)
+        temp = HtmlGenerator.replace_item("#QCOMMENTS#", "", temp)
+        temp = HtmlGenerator.replace_item("#ANSWERS#", "", temp)
+        temp = HtmlGenerator.replace_item("#RELATEDS#", "", temp)
+        html = temp
+        # html = html.replace("&lt;","<",html.count("&lt;"))
+        # html = html.replace("&gt;", ">", html.count("&gt;"))
+        HtmlGenerator.save_html(html_directory + topic_id + ".html", html)
+
+    @staticmethod
+    def questions_to_html_topics_task2(topic_id, title, post, tag_lst, lst_formula_id, html_directory):
+        html = HtmlGenerator.read_html(template_file)
+        temp = HtmlGenerator.replace_item("#TITLE#", title, html)
+        temp = HtmlGenerator.replace_item("#QID#", str(topic_id), temp)
+        temp = HtmlGenerator.replace_item("#QSCORE#", "", temp)
+        temp = HtmlGenerator.replace_item("#POST#", post, temp)
+        temp = HtmlGenerator.replace_item("#ANSWERCOUNT#", "", temp)
+        temp = HtmlGenerator.generate_tags(temp, tag_lst)
+        temp = HtmlGenerator.replace_item("#ASKERINFO#", "", temp)
+        temp = HtmlGenerator.replace_item("#QCOMMENTS#", "", temp)
+        temp = HtmlGenerator.replace_item("#ANSWERS#", "", temp)
+        temp = HtmlGenerator.replace_item("#RELATEDS#", "", temp)
+        html = HtmlGenerator.html_question(temp, lst_formula_id)
+        # html = html.replace("&lt;","<",html.count("&lt;"))
+        # html = html.replace("&gt;", ">", html.count("&gt;"))
+        HtmlGenerator.save_html(html_directory + topic_id + ".html", html)
+
+    @staticmethod
+    def html_question(html, lst_fomrula_id):
+        for formula_id in lst_fomrula_id:
+            html = BeautifulSoup(html, 'html.parser')
+            formula = html.find("span", class_="math-container", id=str(formula_id))
+
+            formula_alone = formula.text
+            question_html_highlighted = str(formula).replace(formula_alone,
+                                                             "<span style=\"background-color: #FFFF00\">" + formula_alone + "</span>")
+            html = str(html).replace(str(formula), question_html_highlighted)
+        # return str(html).replace(str(formula), question_html_highlighted)
+        return html
+
+    @staticmethod
+    def highlight_formula(answer, formula_id):
+        temp = BeautifulSoup(answer, 'lxml')
+        formula = temp.find("span", class_="math-container", id=str(formula_id))
+        formula_alone = formula.text
+        formula = html.unescape(str(formula))
+        question_html_highlighted = formula.replace(formula_alone,
+                                                         "<span style=\"background-color: #FFFF00\">" + formula_alone + "</span>")
+        return str(answer).replace(str(formula), question_html_highlighted)
+
+    @staticmethod
+    def task2_html_view(topic_id, title, question_body, formula_id, tag_list, html_directory_2):
+        html = HtmlGenerator.read_html(template_file_topic)
+        title = title
+        if formula_id in title:
+            title = HtmlGenerator.highlight_formula(title, formula_id)
+        else:
+            question_body = HtmlGenerator.highlight_formula(question_body, formula_id)
+        html = HtmlGenerator.generate_topic(html, title, question_body, tag_list)
+        HtmlGenerator.save_html(html_directory_2 + "/" + str(topic_id) + ".html", html)
