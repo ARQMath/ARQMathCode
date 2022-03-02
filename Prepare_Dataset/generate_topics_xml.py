@@ -226,9 +226,9 @@ def main():
     topic_question_id_file_path = "/home/bm3302/task1_2022_topics.tsv"#args['qid']
     topic_formula_file_path = "/home/bm3302/task2_2022_formula_topics.tsv"#args['ff']
 
-    latex_formula_tsv_file = "../Topics_Formulas_Latex.v0.1.tsv"
-    slt_formula_tsv_file = "../Topics_Formulas_SLT.v0.1.tsv"
-    opt_formula_tsv_file = "../Topics_Formulas_OPT.v0.1.tsv"
+    latex_formula_tsv_file = "./Topics_Formulas_Latex.v0.1.tsv"
+    slt_formula_tsv_file = "./Topics_Formulas_SLT.v0.1.tsv"
+    opt_formula_tsv_file = "./Topics_Formulas_OPT.v0.1.tsv"
     xml_task1 = "./Topics_Task1_v0.1.xml"
     xml_task2 = "./Topics_Task2_v0.1.xml"
 
