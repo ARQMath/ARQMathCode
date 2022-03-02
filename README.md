@@ -151,7 +151,7 @@ The result file is TSV in form of (formula id, old visual id, new visual id).
 ### 4. Generating Formula TSV Index Files 
 Steps 1 to 3 will provide information needed for the final index files.
 
-#####ARQMath-2
+##### ARQMath-2
 To generate the final TSV index files, run the following command:
 ```
 Prepare_Dataset/commands/generate_index_files ./latex_rep ./formula_visual_id.tsv ./temp_round123_combined ./index_dir
@@ -161,7 +161,7 @@ The third input has the intermediate representations from step 2. Finally, the l
 three subdirectory for LaTex, SLT and OPT representations. The TSV files in all three subdirectories have similar format and information
 only the representations of formulas are different.
 
-#####ARQMath-3 
+##### ARQMath-3 
 ARQMath-3 aims to provide a cleaner version of TSV index files and solve the issues detected in the previous years.
 While the incorrect visual ids and representations assigned to formulas can be fixed with the previous steps,
 there are additional steps that should be addressed. 
